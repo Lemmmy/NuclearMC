@@ -19,7 +19,7 @@ public class ServerConfig {
 				configFile.createNewFile();
 				
 				props.setProperty("ServerPort", 		"25565");
-				props.setProperty("ServerIP", 			"127.0.0.1");
+				props.setProperty("ServerIP", 			"0.0.0.0");
 				
 				props.setProperty("MaxPlayers", 		"32");
 				props.setProperty("Name", 				"My NuclearMC Server");

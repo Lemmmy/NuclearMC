@@ -25,6 +25,8 @@ public class Server implements Runnable {
 	private ServerConfig config;
 	private ServerWorkerPool workerPool;
 
+	private String salt;
+
 	public static int BUFFER_SIZE = 2048;
 
 	private boolean running;
@@ -49,7 +51,15 @@ public class Server implements Runnable {
     private static Random rand = new Random();
 
     public static String generateSalt() {
-        return String.valueOf(Math.abs(new SecureRandom().nextLong()));
+		String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		Random rand = new Random();
+
+		char[] buf = new char[16];
+
+		for (int i=0; i<16; i++) {
+			buf[i] = chars.charAt(rand.nextInt(chars.length()));
+		}
+		return new String(buf);
     }
 
 	public void heartbeat(final HeartbeatCallback callback) {
@@ -66,7 +76,7 @@ public class Server implements Runnable {
                                 + "&name=" + URLEncoder.encode(serverName, "UTF-8")
                                 + "&public=" + config.getBool("Public", false)
                                 + "&version=7"
-                                + "&salt=" + generateSalt()
+                                + "&salt=" + salt
                                 + "&users=0");
                         connection = (HttpsURLConnection) url.openConnection();
 
@@ -179,10 +189,12 @@ public class Server implements Runnable {
 		running = true;
 
 		try {
-			socket = new DatagramSocket(config.getInt("ServerPort", 25565), InetAddress.getByName(config.getValue("ServerIP", "127.0.0.1")));
+			socket = new DatagramSocket(config.getInt("ServerPort", 25565), InetAddress.getByName(config.getValue("ServerIP", "0.0.0.0")));
 		} catch (IOException e) {
 			NuclearMC.getLogger().log(Level.SEVERE, "Error while binding socket!", e);
 		}
+
+		salt = generateSalt();
 
 		Thread socketThread = new Thread(new Runnable() {
 			@Override
