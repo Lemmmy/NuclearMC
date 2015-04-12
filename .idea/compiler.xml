@@ -26,5 +26,8 @@
         <module name="NuclearMC" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="NuclearMC" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
 </project>

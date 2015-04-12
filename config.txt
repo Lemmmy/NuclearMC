@@ -1,6 +1,6 @@
-#Sun Apr 12 04:22:32 CEST 2015
+#Sun Apr 12 04:04:47 BST 2015
 ServerPort=25565
-ServerIP=127.0.0.1
+ServerIP=0.0.0.0
 MakeFancyLogs=false
 Name=My NuclearMC Server
 Public=true
