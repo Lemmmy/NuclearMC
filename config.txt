@@ -1,8 +1,10 @@
-#Sun Apr 12 00:12:21 CEST 2015
-Name=My NuclearMC Server
-ServerIP=127.0.0.1
+#Sun Apr 12 04:22:32 CEST 2015
 ServerPort=25565
+ServerIP=127.0.0.1
+MakeFancyLogs=false
+Name=My NuclearMC Server
+Public=true
 MaxWorkers=1
 HeartbeatInterval=45
+MOTD=Welcome to my NuclearMC Server\!
 MaxPlayers=32
-MakeFancyLogs=true
