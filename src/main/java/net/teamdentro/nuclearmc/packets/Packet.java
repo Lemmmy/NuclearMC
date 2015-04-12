@@ -1,18 +1,30 @@
 package net.teamdentro.nuclearmc.packets;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 
 import net.teamdentro.nuclearmc.Server;
 
-public abstract class Packet {
+public abstract class Packet implements IPacket {
 	protected Server server;
-	protected DataInputStream data;
-	
-	public Packet(Server server, DataInputStream data) {
+	protected Socket client;
+    protected DataInputStream data;
+
+	public Packet(Server server, Socket client) {
 		this.server = server;
-		this.data = data;
-	}
+		this.client = client;
+
+        if (client != null) {
+            try {
+                this.data = new DataInputStream(client.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 	
 	public abstract byte getID();
 	

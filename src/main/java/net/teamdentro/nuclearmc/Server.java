@@ -1,11 +1,6 @@
 package net.teamdentro.nuclearmc;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.security.SecureRandom;
@@ -17,11 +12,10 @@ import java.util.logging.Level;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import net.teamdentro.nuclearmc.packets.Packet;
-import net.teamdentro.nuclearmc.packets.Packet0Connect;
+import net.teamdentro.nuclearmc.packets.*;
 
 public class Server implements Runnable {
-	private DatagramSocket socket;
+	//private DatagramSocket socket;
 	private ServerConfig config;
 	private ServerWorkerPool workerPool;
 
@@ -31,18 +25,29 @@ public class Server implements Runnable {
 
 	private boolean running;
 
-	protected static Map<Byte, Class<? extends Packet>> packetRegistry = new HashMap<>();
+	protected static Map<Byte, Class<? extends IPacket>> packetRegistry = new HashMap<>();
 
 	public static void registerPacket(Class<? extends Packet> packet) {
 		Packet p;
 		try {
-			p = packet.getDeclaredConstructor(Server.class, DataInputStream.class).newInstance(null, null);
+			p = packet.getDeclaredConstructor(Server.class, Socket.class).newInstance(null, null);
 			byte id = p.getID();
 			packetRegistry.put(id, packet);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+    public static void registerServerPacket(Class<? extends ServerPacket> packet) {
+        ServerPacket p;
+        try {
+            p = packet.getDeclaredConstructor(Server.class, User.class).newInstance(null, null);
+            byte id = p.getID();
+            packetRegistry.put(id, packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 	public boolean isRunning() {
 		return running;
@@ -82,6 +87,9 @@ public class Server implements Runnable {
 
                         connection.setRequestMethod("GET");
                         connection.setDoInput(true);
+                        connection.setDoOutput(false);
+                        connection.setAllowUserInteraction(false);
+                        connection.setRequestProperty("X-Clacks-Overhead", "GNU Terry Pratchett");
 
                         try (InputStream stream = connection.getInputStream();
                              BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
@@ -95,11 +103,35 @@ public class Server implements Runnable {
                     }
                 }
 
-                // WoM Heartbeat
-                try {
+                {
+                    // WoM Heartbeat
+                    HttpURLConnection connection = null;
 
-                } catch (IOException e) {
+                    try {
+                        URL url = new URL("http://direct.worldofminecraft.com/hb.php"
+                                + "?port=" + config.getInt("ServerPort", 25565)
+                                + "&max=" + config.getInt("MaxPlayers", 32)
+                                + "&name=" + URLEncoder.encode(serverName, "UTF-8")
+                                + "&public=" + config.getBool("Public", false)
+                                + "&version=7"
+                                + "&salt=" + salt
+                                + "&users=0"
+                                + "&noforward=1");
 
+                        connection = (HttpURLConnection) url.openConnection();
+
+                        connection.setRequestMethod("GET");
+                        connection.setDoInput(false);
+                        connection.setDoOutput(false);
+                        connection.setAllowUserInteraction(false);
+                        connection.setRequestProperty("X-Clacks-Overhead", "GNU Terry Pratchett");
+                        connection.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
+                        connection.setUseCaches(false);
+
+                        connection.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 			}
 		});
@@ -137,28 +169,27 @@ public class Server implements Runnable {
 
 	public Server() {
 		registerPacket(Packet0Connect.class);
+        registerServerPacket(SPacket0EDisconnect.class);
 
 		running = false;
 		config = new ServerConfig();
 
 		setupLogFiles();
 
-		workerPool = new ServerWorkerPool(config.getInt("MaxWorkers", 1));
+		workerPool = new ServerWorkerPool(this, config.getInt("MaxWorkers", 1));
 
 		heartbeatInterval = (int) (heartbeatTimer = config.getInt("HeartbeatInterval", 45));
 		serverName = config.getValue("Name", "My NuclearMC Server");
 		motd = config.getValue("MOTD", "Welcome to my NuclearMC Server!");
 	}
 
+    private ServerSocket socket;
+
 	public void socketLoop() {
 		try {
-			byte[] buffer = new byte[BUFFER_SIZE];
-			DatagramPacket packet = new DatagramPacket(/*&*/buffer, buffer.length);
-			socket.receive(packet);
-
-            NuclearMC.getLogger().info("Got: " + new String(packet.getData()));
-
-			workerPool.processPacket(packet);
+			Socket client = socket.accept();
+            DataInputStream dis = new DataInputStream(client.getInputStream());
+            workerPool.processPacket(dis, client);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -189,7 +220,8 @@ public class Server implements Runnable {
 		running = true;
 
 		try {
-			socket = new DatagramSocket(config.getInt("ServerPort", 25565), InetAddress.getByName(config.getValue("ServerIP", "0.0.0.0")));
+			socket = new ServerSocket();
+            socket.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
 		} catch (IOException e) {
 			NuclearMC.getLogger().log(Level.SEVERE, "Error while binding socket!", e);
 		}
