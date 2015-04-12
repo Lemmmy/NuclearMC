@@ -1,0 +1,8 @@
+#Sun Apr 12 00:12:21 CEST 2015
+Name=My NuclearMC Server
+ServerIP=127.0.0.1
+ServerPort=25565
+MaxWorkers=1
+HeartbeatInterval=45
+MaxPlayers=32
+MakeFancyLogs=true
