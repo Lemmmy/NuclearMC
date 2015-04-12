@@ -35,12 +35,8 @@ public class SPacket0ServerIdentify extends ServerPacket {
             data.writeByte(getID());
             data.writeByte(0x07);
             writeString(server.getServerName());
-
-            NuclearMC.getLogger().info(server.getMotd());
             writeString(server.getMotd());
             data.writeByte(isOp() ? 0x64 : 0x00); // not op
-
-            data.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,7 @@
 package net.teamdentro.nuclearmc;
 
+import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -16,6 +18,7 @@ public class User {
     private DataOutputStream outputStream;
     private String username;
     private Socket socket;
+    private byte playerID;
 
     public User(String username, InetAddress sender, int port, Socket socket) {
         this.sender = sender;
@@ -32,6 +35,14 @@ public class User {
 
         this.socket = socket;
         this.username = username;
+    }
+
+    public byte getPlayerID() {
+        return playerID;
+    }
+
+    public void setPlayerID(byte playerID) {
+        this.playerID = playerID;
     }
 
     public Socket getSocket() {
@@ -56,6 +67,18 @@ public class User {
 
     public String getUsername() {
         return username;
+    }
+
+    public void sendMessage(String message) {
+        sendMessage(message, Byte.MAX_VALUE);
+    }
+
+    public void sendMessage(String message, byte playerID) {
+        SPacket0DChatMessage msg = new SPacket0DChatMessage(Server.instance, this);
+        msg.setMessage(message);
+        msg.setPlayerID(playerID);
+        msg.setRecipient(this);
+        msg.send();
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Level {
     }
 
     public int getBlock(int x, int y, int z) {
-        return x >= 0 && y >= 0 && z >= 0 && x < width && y < depth && z < height ? blocks[getIndex(x, y, z)] & 255 : 0;
+        return x >= 0 && y >= 0 && z >= 0 && x < width && y < depth && z < height ? blocks[getIndex(x, y, z)] : 0;
     }
 
     public void setBlock(int x, int y, int z, int id) {
@@ -33,7 +33,7 @@ public class Level {
     }
 
     public int getIndex(int x, int y, int z) {
-        return (y * height + z) * width + x;
+        return (y * depth + z) * width + x;
     }
 
     private Random rand = new Random();

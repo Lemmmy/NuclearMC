@@ -28,8 +28,8 @@ public class GUI extends JFrame {
         lookAndFeel();
         frame();
         tray();
-        listeners();
         components();
+        listeners();
 
         setVisible(true);
     }
@@ -157,6 +157,23 @@ public class GUI extends JFrame {
                 }
             }
         });
+
+        usersList.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    usersListPopupMenu.show(GUI.this, 5, usersList.getCellBounds(
+                            usersList.getSelectedIndex() + 1,
+                            usersList.getSelectedIndex() + 1).y);
+                }
+            }
+        });
+
+        settingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showSettingsPanel();
+            }
+        });
     }
 
     private void components() {
@@ -186,25 +203,10 @@ public class GUI extends JFrame {
         usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         usersList.setComponentPopupMenu(usersListPopupMenu);
         usersList.setLayoutOrientation(JList.VERTICAL);
-        usersList.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    usersListPopupMenu.show(GUI.this, 5, usersList.getCellBounds(
-                            usersList.getSelectedIndex() + 1,
-                            usersList.getSelectedIndex() + 1).y);
-                }
-            }
-        });
 
         extendableSidebarArea.add(usersList);
 
         settingsButton = new JButton("Settings");
-        settingsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSettingsPanel();
-            }
-        });
 
         sidebarArea.add(extendableSidebarArea, BorderLayout.CENTER);
         sidebarArea.add(settingsButton, BorderLayout.PAGE_END);
@@ -214,7 +216,11 @@ public class GUI extends JFrame {
         add(splitPane, BorderLayout.CENTER);
     }
 
-    private void showSettingsPanel() {
+    /**
+     * Show the server settings panel in the GUI
+     */
+    public void showSettingsPanel() {
+        new SettingsScreen(this);
     }
 
     private void shutDown() {

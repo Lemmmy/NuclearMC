@@ -22,6 +22,8 @@ public class Server implements Runnable {
 
 	protected static Map<Byte, Class<? extends IPacket>> packetRegistry = new HashMap<>();
 
+    public static Server instance;
+
 	public static void registerPacket(Class<? extends Packet> packet) {
 		Packet p;
 		try {
@@ -196,6 +198,7 @@ public class Server implements Runnable {
 
     static {
         registerPacket(Packet0Connect.class);
+        registerPacket(Packet0DMessage.class);
     }
 
 	public Server() {
@@ -212,6 +215,12 @@ public class Server implements Runnable {
 
         level = new Level();
 	}
+
+    private byte lastPlayerID = Byte.MIN_VALUE;
+
+    public byte makeUniquePlayerID() {
+        return ++lastPlayerID;
+    }
 
     private Level level;
 
@@ -277,6 +286,14 @@ public class Server implements Runnable {
             packet.setRecipient(user);
             packet.send();
         }
+
+        packet.setRecipient(originalUser);
+    }
+
+    public void broadcastMessage(String msg) {
+        for (User user : users) {
+            user.sendMessage(msg);
+        }
     }
 
 	@Override
@@ -319,5 +336,9 @@ public class Server implements Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public ServerConfig getServerConfig() {
+		return config;
 	}
 }

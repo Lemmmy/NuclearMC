@@ -13,8 +13,13 @@ public class ServerConfig {
 	private LuaTable config;
 	
 	public ServerConfig() {
+		loadConfig();
+	}
+
+	public void loadConfig() {
+		config = null;
 		configFile = new File("config.lua");
-		
+
 		if (!configFile.exists()) {
 			try {
 				InputStream defaultFile = getClass().getClassLoader().getResourceAsStream("config.default.lua");
@@ -28,7 +33,7 @@ public class ServerConfig {
 		config = lua.get("dofile").call(
 				LuaValue.valueOf("./config.default.lua")).checktable();
 	}
-	
+
 	public String getValue(String key, String def) {
 		return config.get(key) != null ? config.get(key).tojstring() : def;
 	}
@@ -38,10 +43,10 @@ public class ServerConfig {
 	}
 	
 	public boolean getBoolean(String key, boolean def) {
-		return config.get(key) != null && config.get(key).isboolean()  ? config.get(key).toboolean() : def;
+		return config.get(key) != null && config.get(key).isboolean() ? config.get(key).toboolean() : def;
 	}
 
-	public int getType(String key) {
-		return config.get(key) != null ? config.get(key).type() : LuaValue.TNIL;
+	public LuaTable getConfig() {
+		return config;
 	}
 }

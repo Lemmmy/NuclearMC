@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 public class NuclearMC {
 	private static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private static GUI gui;
-	private static Server server;
 	
 	public static Logger getLogger() {
 		return LOGGER;
@@ -43,8 +42,8 @@ public class NuclearMC {
 			getLogger().addHandler(chandler);
 		}
 
-		server = new Server();
-		server.run();
+		Server.instance = new Server();
+        Server.instance.run();
 	}
 
 	public static boolean isGUI() {
