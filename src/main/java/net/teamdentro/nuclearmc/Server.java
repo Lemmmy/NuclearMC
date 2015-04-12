@@ -1,9 +1,7 @@
 package net.teamdentro.nuclearmc;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.net.*;
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.logging.FileHandler;
 
@@ -76,7 +74,7 @@ public class Server implements Runnable {
                                 + "?port=" + config.getInt("ServerPort", 25565)
                                 + "&max=" + config.getInt("MaxPlayers", 32)
                                 + "&name=" + URLEncoder.encode(serverName, "UTF-8")
-                                + "&public=" + config.getBool("Public", false)
+                                + "&public=" + config.getBoolean("Public", false)
                                 + "&version=7"
                                 + "&salt=" + salt
                                 + "&users=0");
@@ -109,7 +107,7 @@ public class Server implements Runnable {
                                 + "?port=" + config.getInt("ServerPort", 25565)
                                 + "&max=" + config.getInt("MaxPlayers", 32)
                                 + "&name=" + URLEncoder.encode(serverName, "UTF-8")
-                                + "&public=" + config.getBool("Public", false)
+                                + "&public=" + config.getBoolean("Public", false)
                                 + "&version=7"
                                 + "&salt=" + salt
                                 + "&users=" + getOnlineUsers().length
@@ -142,7 +140,7 @@ public class Server implements Runnable {
 				logDir.mkdir();
 			}
 
-			boolean fancy = config.getBool("MakeFancyLogs", false);
+			boolean fancy = config.getBoolean("MakeFancyLogs", false);
 			NuclearMC.getLogger().config("MakeFancyLogs = " + fancy);
 
 			FileHandler fhandler = new FileHandler("logs/server.log" + (fancy ? ".html" : ""));

@@ -13,14 +13,11 @@ public class ServerConfig {
 	private LuaTable config;
 	
 	public ServerConfig() {
-		props = new HashMap<>();
 		configFile = new File("config.lua");
 		
 		if (!configFile.exists()) {
 			try {
-				configFile.createNewFile();
-
-				InputStream defaultFile = NuclearMC.class.getResourceAsStream("config.default.lua");
+				InputStream defaultFile = getClass().getClassLoader().getResourceAsStream("config.default.lua");
 				Files.copy(defaultFile, configFile.toPath());
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -37,23 +34,14 @@ public class ServerConfig {
 	}
 	
 	public int getInt(String key, int def) {
-		try {
-			return Integer.parseInt(props.getProperty(key, String.valueOf(def)));
-		} catch (NumberFormatException e) {
-			return def;
-		}
+		return config.get(key) != null && config.get(key).isint() ? config.get(key).toint() : def;
 	}
 	
-	public boolean getBool(String key, boolean def) {
-		switch (props.getProperty(key, String.valueOf(def)).toLowerCase()) {
-		case "true":
-			return true;
-			
-		case "false":
-			return false;
-			
-		default:
-			return def;
-		}
+	public boolean getBoolean(String key, boolean def) {
+		return config.get(key) != null && config.get(key).isboolean()  ? config.get(key).toboolean() : def;
+	}
+
+	public int getType(String key) {
+		return config.get(key) != null ? config.get(key).type() : LuaValue.TNIL;
 	}
 }

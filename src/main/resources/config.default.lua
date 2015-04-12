@@ -1,5 +1,5 @@
 return {
-    ServerPort = 255565,
+    ServerPort = 25565,
     ServerIP = "0.0.0.0",
 
     MaxPlayers = 32,
