@@ -56,9 +56,11 @@ public class Server implements Runnable {
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				HttpsURLConnection connection = null;
-				try {
-					URL url = new URL("https://minecraft.net/heartbeat.jsp"
+                // Minecraft Heartbeat
+                {
+                    HttpsURLConnection connection = null;
+                    try {
+                        URL url = new URL("https://minecraft.net/heartbeat.jsp"
                                 + "?port=" + config.getInt("ServerPort", 25565)
                                 + "&max=" + config.getInt("MaxPlayers", 32)
                                 + "&name=" + URLEncoder.encode(serverName, "UTF-8")
@@ -66,19 +68,29 @@ public class Server implements Runnable {
                                 + "&version=7"
                                 + "&salt=" + generateSalt()
                                 + "&users=0");
-					connection = (HttpsURLConnection) url.openConnection();
+                        connection = (HttpsURLConnection) url.openConnection();
 
-					connection.setRequestMethod("GET");
-					connection.setDoInput(true);
+                        connection.setRequestMethod("GET");
+                        connection.setDoInput(true);
 
-					try (	InputStream stream = connection.getInputStream();
-							BufferedReader reader = new BufferedReader(new InputStreamReader(stream)) ) {
-						String serverURL = reader.readLine();
-						callback.run(serverURL);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+                        try (InputStream stream = connection.getInputStream();
+                             BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+                            String serverURL = reader.readLine();
+                            callback.run(serverURL);
+                        }
+
+                        connection.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // WoM Heartbeat
+                try {
+
+                } catch (IOException e) {
+
+                }
 			}
 		});
 		t.run();
