@@ -1,10 +1,11 @@
-/bin/
-/logs/
+bin/
+logs/
 config.txt
-/target/
-/.idea/
+target/
+.idea/
 *.iml
 *.iws
 .classpath
 .project
-/.settings/
+.settings/
+out/
