@@ -29,7 +29,7 @@ public class NuclearMC {
 		chandler.setLevel(Level.ALL);
 		getLogger().addHandler(chandler);
 		
-		Server server = new Server();
-		server.run();
+		Server.instance = new Server();
+        Server.instance.run();
 	}
 }

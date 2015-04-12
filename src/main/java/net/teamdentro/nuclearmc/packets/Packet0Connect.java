@@ -19,7 +19,6 @@ public class Packet0Connect extends Packet {
 	public Packet0Connect(Server server, Socket client) {
 		super(server, client);
 	}
-	
 
 	public byte getProtVersion() {
 		return protVersion;
@@ -49,11 +48,12 @@ public class Packet0Connect extends Packet {
 			username = readString(64).trim(); // WHO DID THIS AND WHY?
 			key = readString(64).trim();
 			userdata = data.readByte();
-			
-			NuclearMC.getLogger().info("Player " + username + " connected to the server.");
 
             User user = new User(username, client.getInetAddress(), client.getPort(), client);
+            user.setPlayerID(server.makeUniquePlayerID());
             server.addUser(user);
+
+            NuclearMC.getLogger().info("Player " + username + " [" + user.getAddress().toString() + ":" + user.getPort() + "] (EID " + user.getPlayerID() + ")");
 
             SPacket0ServerIdentify identify = new SPacket0ServerIdentify(server, user);
             identify.setOp(true);
@@ -61,13 +61,17 @@ public class Packet0Connect extends Packet {
 
             server.getLevel().sendToUser(server, user);
 
-            SPacket08Teleport tp = new SPacket08Teleport(server, user);
-            tp.setX(server.getLevel().getSpawnX() * 32);
-            tp.setY(server.getLevel().getSpawnY() * 32 + 51);
-            tp.setZ(server.getLevel().getSpawnZ() * 32);
-            tp.setPitch(0);
-            tp.setYaw(0);
-            tp.send();
+            SPacket07SpawnPlayer spawn = new SPacket07SpawnPlayer(server, user);
+            spawn.setX(server.getLevel().getSpawnX() * 32);
+            spawn.setY(server.getLevel().getSpawnY() * 32 + 51);
+            spawn.setZ(server.getLevel().getSpawnZ() * 32);
+            spawn.setPlayerID(user.getPlayerID());
+            spawn.setPitch(0);
+            spawn.setYaw(0);
+            spawn.setName(user.getUsername());
+            spawn.send();
+
+            user.sendMessage("Welcome to the server!");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

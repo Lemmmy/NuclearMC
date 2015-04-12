@@ -26,6 +26,16 @@ public abstract class Packet implements IPacket {
             }
         }
     }
+
+    public User getUser() {
+        for (User user : server.getOnlineUsers()) {
+            if (user.getAddress().equals(client.getInetAddress()) && user.getPort() == client.getPort()) {
+                return user;
+            }
+        }
+
+        return null;
+    }
 	
 	public abstract byte getID();
 	
