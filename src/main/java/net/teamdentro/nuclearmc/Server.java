@@ -4,11 +4,8 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.FileHandler;
-import java.util.logging.Level;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -115,7 +112,7 @@ public class Server implements Runnable {
                                 + "&public=" + config.getBool("Public", false)
                                 + "&version=7"
                                 + "&salt=" + salt
-                                + "&users=0"
+                                + "&users=" + getOnlineUsers().length
                                 + "&noforward=1");
 
                         connection = (HttpURLConnection) url.openConnection();
@@ -149,7 +146,7 @@ public class Server implements Runnable {
 			NuclearMC.getLogger().config("MakeFancyLogs = " + fancy);
 
 			FileHandler fhandler = new FileHandler("logs/server.log" + (fancy ? ".html" : ""));
-			fhandler.setLevel(Level.CONFIG);
+			fhandler.setLevel(java.util.logging.Level.CONFIG);
 
 			if (fancy) {
 				fhandler.setFormatter(new FancyFormatter());
@@ -163,14 +160,47 @@ public class Server implements Runnable {
 		}
 	}
 
+    private List<User> users = new ArrayList<>();
+
 	private int heartbeatInterval;
 	private String serverName;
 	private String motd;
 
-	public Server() {
-		registerPacket(Packet0Connect.class);
-        registerServerPacket(SPacket0EDisconnect.class);
+    public User[] getOnlineUsers() {
+        return users.toArray(new User[0]);
+    }
 
+    public void addUser(User user) {
+        users.add(user);
+    }
+
+    public void kickUser(User user, String reason) {
+        users.remove(user);
+
+        SPacket0EDisconnect dc = new SPacket0EDisconnect(this, user);
+        dc.setReason(reason);
+        dc.send();
+
+        try {
+            user.getSocket().close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void kickPlayer(String player, String reason) {
+        for (User user : users) {
+            if (user.getUsername().equals(player)) {
+                kickUser(user, reason);
+            }
+        }
+    }
+
+    static {
+        registerPacket(Packet0Connect.class);
+    }
+
+	public Server() {
 		running = false;
 		config = new ServerConfig();
 
@@ -181,7 +211,19 @@ public class Server implements Runnable {
 		heartbeatInterval = (int) (heartbeatTimer = config.getInt("HeartbeatInterval", 45));
 		serverName = config.getValue("Name", "My NuclearMC Server");
 		motd = config.getValue("MOTD", "Welcome to my NuclearMC Server!");
+
+        level = new Level();
 	}
+
+    private Level level;
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
+    }
 
     private ServerSocket socket;
 
@@ -198,7 +240,15 @@ public class Server implements Runnable {
 	private float heartbeatTimer;
     private String serverURL = "";
 
-	public void update(float dt) {
+    public String getServerName() {
+        return serverName;
+    }
+
+    public String getMotd() {
+        return motd;
+    }
+
+    public void update(float dt) {
 		heartbeatTimer += dt;
 		if (heartbeatTimer >= heartbeatInterval) {
 			heartbeatTimer = 0;
@@ -212,18 +262,35 @@ public class Server implements Runnable {
 				}
 			});
 		}
+
+        for (int i = 0; i < users.size(); ++i) {
+            User user = users.get(i);
+            if (user.getSocket().isClosed()) {
+                users.remove(i);
+                NuclearMC.getLogger().info(user.getUsername() + " has disconnected.");
+            }
+        }
 	}
+
+    public void broadcast(ServerPacket packet) {
+        User originalUser = packet.getRecipient();
+
+        for (User user : users) {
+            packet.setRecipient(user);
+            packet.send();
+        }
+    }
 
 	@Override
 	public void run() {
-		NuclearMC.getLogger().info("Starting server...");
+		NuclearMC.getLogger().info("Starting server on port " + config.getInt("ServerPort", 25565));
 		running = true;
 
 		try {
 			socket = new ServerSocket();
             socket.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
 		} catch (IOException e) {
-			NuclearMC.getLogger().log(Level.SEVERE, "Error while binding socket!", e);
+			NuclearMC.getLogger().severe("Error while binding socket! Is the port in use?");
 		}
 
 		salt = generateSalt();

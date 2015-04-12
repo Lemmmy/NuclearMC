@@ -23,16 +23,21 @@ public abstract class ServerPacket implements IPacket {
         }
     }
 
+    public void setRecipient(User user) {
+        client = user;
+    }
+
+    public User getRecipient() {
+        return client;
+    }
+
     public abstract byte getID();
 
     public abstract void send();
 
     public void writeString(String str) {
         try {
-            for (int i = 0; i < str.length(); ++i) {
-                char c = str.charAt(i);
-                data.writeChar(c);
-            }
+            data.writeBytes(str);
 
             int paddingNeeded = 64 - str.length();
             for (int i = 0; i < paddingNeeded; ++i) {
