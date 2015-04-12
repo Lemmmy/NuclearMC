@@ -9,14 +9,29 @@ import java.io.IOException;
 public class GUI extends JFrame {
     private static final String TITLE = "NuclearMC Server";
 
+    private Image icon;
     private TrayIcon trayIcon;
     private SystemTray tray;
+
+    private JTextField inputField;
+    private JSplitPane splitPane;
+    private JPanel consoleArea;
+    private JPanel sidebarArea;
+    private JPanel extendableSidebarArea;
+    private JTextArea consoleTextArea;
+    private JButton settingsButton;
+    private JList usersList;
+    private DefaultListModel<String> usersListModel;
+    private JPopupMenu usersListPopupMenu;
 
     public GUI() {
         lookAndFeel();
         frame();
-        icons();
+        tray();
         listeners();
+        components();
+
+        setVisible(true);
     }
 
     private void lookAndFeel() {
@@ -30,21 +45,22 @@ public class GUI extends JFrame {
 
     private void frame() {
         setTitle(TITLE);
-        setSize(640, 480);
+        setSize(900, 480);
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        setVisible(true);
-    }
+        setLocationRelativeTo(null);
 
-    private void icons() {
-        tray = SystemTray.getSystemTray();
-
-        Image image = null;
         try {
-            image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("icon.png"));
+            icon = ImageIO.read(getClass().getClassLoader().getResourceAsStream("icon.png"));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
         }
+
+        setIconImage(icon);
+    }
+
+    private void tray() {
+        tray = SystemTray.getSystemTray();
 
         PopupMenu popup = new PopupMenu();
 
@@ -83,7 +99,7 @@ public class GUI extends JFrame {
         popup.add(showItem);
         popup.add(exitItem);
 
-        trayIcon = new TrayIcon(image, TITLE, popup);
+        trayIcon = new TrayIcon(icon, TITLE, popup);
         trayIcon.addActionListener(showActionListener);
         trayIcon.setImageAutoSize(true);
     }
@@ -143,9 +159,88 @@ public class GUI extends JFrame {
         });
     }
 
+    private void components() {
+        setLayout(new BorderLayout());
+
+        consoleArea = new JPanel(new BorderLayout());
+        sidebarArea = new JPanel(new BorderLayout());
+        extendableSidebarArea = new JPanel();
+        extendableSidebarArea.setLayout(new GridLayout());
+        ((GridLayout)extendableSidebarArea.getLayout()).setRows(1);
+
+        inputField = new JTextField();
+        consoleArea.add(inputField, BorderLayout.PAGE_END);
+
+        consoleTextArea = new JTextArea();
+        consoleTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
+
+        JScrollPane consoleScrollPane = new JScrollPane(consoleTextArea);
+        consoleScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        consoleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        consoleArea.add(consoleScrollPane, BorderLayout.CENTER);
+
+        usersListPopupMenu = new JPopupMenu();
+
+        usersListModel = new DefaultListModel<>();
+        usersList = new JList(usersListModel);
+        usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        usersList.setComponentPopupMenu(usersListPopupMenu);
+        usersList.setLayoutOrientation(JList.VERTICAL);
+        usersList.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    usersListPopupMenu.show(GUI.this, 5, usersList.getCellBounds(
+                            usersList.getSelectedIndex() + 1,
+                            usersList.getSelectedIndex() + 1).y);
+                }
+            }
+        });
+
+        extendableSidebarArea.add(usersList);
+
+        settingsButton = new JButton("Settings");
+        settingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showSettingsPanel();
+            }
+        });
+
+        sidebarArea.add(extendableSidebarArea, BorderLayout.CENTER);
+        sidebarArea.add(settingsButton, BorderLayout.PAGE_END);
+
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, consoleArea, sidebarArea);
+        splitPane.setResizeWeight(0.8);
+        add(splitPane, BorderLayout.CENTER);
+    }
+
+    private void showSettingsPanel() {
+    }
+
     private void shutDown() {
         NuclearMC.shutDown();
         dispose();
         System.exit(0);
+    }
+
+    /**
+     * Get the GUI's sidebar. Used for plugins
+     * @return The GUI's sidebar, as a JPanel
+     */
+    public JPanel getSidebar() {
+        return sidebarArea;
+    }
+
+    /**
+     * Long winded name for a simple method
+     */
+    public void addUsersListPopupMenuItem(String text, ActionListener actionListener) {
+        JMenuItem menuItem = new JMenuItem(text);
+        menuItem.addActionListener(actionListener);
+        usersListPopupMenu.add(menuItem);
+    }
+
+    protected JTextArea getTextArea() {
+        return consoleTextArea;
     }
 }

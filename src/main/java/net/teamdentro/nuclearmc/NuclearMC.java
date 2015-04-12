@@ -32,6 +32,10 @@ public class NuclearMC {
 
 		if (arguments.contains("-g") || arguments.contains("--gui")) {
 			gui = new GUI();
+			GUILogHandler handler = new GUILogHandler();
+			handler.setLevel(Level.ALL);
+			handler.setTextArea(gui.getTextArea());
+			getLogger().addHandler(handler);
 		} else {
 			ConsoleHandler chandler = new ConsoleHandler();
 			chandler.setFormatter(new ConsoleFormatter());
