@@ -52,10 +52,22 @@ public class Packet0Connect extends Packet {
 			
 			NuclearMC.getLogger().info("Player " + username + " connected to the server.");
 
-            User user = new User(username, client.getInetAddress(), client.getPort(), data, new DataOutputStream(client.getOutputStream()));
-            SPacket0EDisconnect dc = new SPacket0EDisconnect(server, user);
-            dc.setReason("This is a test server! Sorry :(");
-            dc.send();
+            User user = new User(username, client.getInetAddress(), client.getPort(), client);
+            server.addUser(user);
+
+            SPacket0ServerIdentify identify = new SPacket0ServerIdentify(server, user);
+            identify.setOp(true);
+            identify.send();
+
+            server.getLevel().sendToUser(server, user);
+
+            SPacket08Teleport tp = new SPacket08Teleport(server, user);
+            tp.setX(server.getLevel().getSpawnX() * 32);
+            tp.setY(server.getLevel().getSpawnY() * 32 + 51);
+            tp.setZ(server.getLevel().getSpawnZ() * 32);
+            tp.setPitch(0);
+            tp.setYaw(0);
+            tp.send();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

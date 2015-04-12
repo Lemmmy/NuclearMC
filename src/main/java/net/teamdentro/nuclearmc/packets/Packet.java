@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import net.teamdentro.nuclearmc.Server;
+import net.teamdentro.nuclearmc.User;
 
 public abstract class Packet implements IPacket {
 	protected Server server;
