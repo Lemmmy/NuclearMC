@@ -1,54 +1,39 @@
 package net.teamdentro.nuclearmc;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.JsePlatform;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.HashMap;
 
 public class ServerConfig {
 	private File configFile;
-	private Properties props;
+	private LuaTable config;
 	
 	public ServerConfig() {
-		props = new Properties();
-		configFile = new File("config.txt");
+		props = new HashMap<>();
+		configFile = new File("config.lua");
 		
 		if (!configFile.exists()) {
 			try {
 				configFile.createNewFile();
-				
-				props.setProperty("ServerPort", 		"25565");
-				props.setProperty("ServerIP", 			"0.0.0.0");
-				
-				props.setProperty("MaxPlayers", 		"32");
-				props.setProperty("Name", 				"My NuclearMC Server");
-				
-				props.setProperty("HeartbeatInterval", 	"45");
-				props.setProperty("MaxWorkers", 		"1");
-				
-				props.setProperty("MakeFancyLogs", 		"false");
-				
-				props.setProperty("MOTD",               "Welcome to my NuclearMC Server!");
-                props.setProperty("Public",             "false");
 
-				try (FileOutputStream fos = new FileOutputStream(configFile)) {
-					props.store(fos, null);
-				}
+				InputStream defaultFile = NuclearMC.class.getResourceAsStream("config.default.lua");
+				Files.copy(defaultFile, configFile.toPath());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		try (FileInputStream fis = new FileInputStream(configFile)) {
-			props.load(fis);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		LuaValue lua = JsePlatform.standardGlobals();
+		config = lua.get("dofile").call(
+				LuaValue.valueOf("./config.default.lua")).checktable();
 	}
 	
 	public String getValue(String key, String def) {
-		return props.getProperty(key, def);
+		return config.get(key) != null ? config.get(key).tojstring() : def;
 	}
 	
 	public int getInt(String key, int def) {
