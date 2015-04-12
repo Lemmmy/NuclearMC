@@ -19,14 +19,17 @@ public class ServerWorker implements Runnable {
     private Server server;
     private Socket client;
 
+    private byte id;
+
 	public ServerWorker(Server server) {
 		this.server = server;
         workerThread = new Thread(this);
 	}
 	
-	public void process(DataInputStream packet, Socket client) {
+	public void process(byte id, DataInputStream packet, Socket client) {
         work = packet;
         this.client = client;
+        this.id = id;
 
 		workerThread.run();
 	}
@@ -38,7 +41,6 @@ public class ServerWorker implements Runnable {
 	@Override
 	public void run() {
         try {
-            byte id = work.readByte();
             Class<? extends IPacket> packetClass = Server.packetRegistry.get(id);
             if (packetClass == null) {
                 NuclearMC.getLogger().warning("Received invalid packet (0x" + Integer.toHexString(id) + ") from " + client.getInetAddress().toString() + ":" + client.getPort());

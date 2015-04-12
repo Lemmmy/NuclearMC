@@ -18,10 +18,10 @@ public class ServerWorkerPool {
 		}
 	}
 	
-	public void processPacket(DataInputStream packet, Socket client) {
+	public void processPacket(byte id, DataInputStream packet, Socket client) {
 		for (ServerWorker worker : workers) {
 			if (!worker.isBusy()) {
-				worker.process(packet, client);
+				worker.process(id, packet, client);
 			}
 		}
 	}
