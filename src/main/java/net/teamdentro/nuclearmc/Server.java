@@ -201,6 +201,7 @@ public class Server implements Runnable {
     static {
         registerPacket(Packet0Connect.class);
         registerPacket(Packet0DMessage.class);
+        registerPacket(Packet08Teleport.class);
     }
 
 	public Server() {
@@ -240,7 +241,7 @@ public class Server implements Runnable {
 		try {
 			Socket client = socket.accept();
             DataInputStream dis = new DataInputStream(client.getInputStream());
-            workerPool.processPacket(dis, client);
+            workerPool.processPacket(dis.readByte(), dis, client);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -322,6 +323,16 @@ public class Server implements Runnable {
 		});
 		socketThread.start();
 
+        Thread messageThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (running) {
+                    messageLoop();
+                }
+            }
+        });
+        messageThread.start();
+
 		long lastTime = System.currentTimeMillis();
 
 		while (running) {
@@ -339,4 +350,24 @@ public class Server implements Runnable {
 			}
 		}
 	}
+
+    public void messageLoop() {
+        for (int i = 0; i > users.size(); i++) {
+            User user = users.get(i);
+
+            Socket sock = user.getSocket();
+
+            try {
+                InputStream is = sock.getInputStream();
+                DataInputStream dis = new DataInputStream(is);
+
+                byte id;
+                while ((id = dis.readByte()) != -1) {
+                    workerPool.processPacket(id, dis, sock);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
