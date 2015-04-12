@@ -9,7 +9,8 @@ import java.util.logging.Logger;
 
 public class NuclearMC {
 	private static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private static boolean gui;
+	private static GUI gui;
+	private static Server server;
 	
 	public static Logger getLogger() {
 		return LOGGER;
@@ -19,7 +20,6 @@ public class NuclearMC {
 	
 	public static void main(String[] args) {
 		List<String> arguments = Arrays.asList(args);
-		gui = arguments.contains("-g") || arguments.contains("--gui");
 
 		MAIN_THREAD_ID = Thread.currentThread().getId();
 		
@@ -30,8 +30,8 @@ public class NuclearMC {
 			getLogger().removeHandler(handler);
 		}
 
-		if (gui) {
-
+		if (arguments.contains("-g") || arguments.contains("--gui")) {
+			gui = new GUI();
 		} else {
 			ConsoleHandler chandler = new ConsoleHandler();
 			chandler.setFormatter(new ConsoleFormatter());
@@ -39,11 +39,19 @@ public class NuclearMC {
 			getLogger().addHandler(chandler);
 		}
 
-		Server server = new Server();
+		server = new Server();
 		server.run();
 	}
 
 	public static boolean isGUI() {
+		return gui!=null;
+	}
+
+	public static GUI getGUI() {
 		return gui;
+	}
+
+	public static void shutDown() {
+		// server.shutDown();
 	}
 }
