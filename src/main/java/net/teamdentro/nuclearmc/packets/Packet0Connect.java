@@ -44,8 +44,8 @@ public class Packet0Connect extends Packet {
 	public void handle() {
 		try {
 			protVersion = data.readByte();
-			username = readString(64).trim(); // WHO DID THIS AND WHY?
-			key = readString(64).trim();
+			username = readString().trim();
+			key = readString().trim();
 			userdata = data.readByte();
 
             User user = new User(username, (InetSocketAddress)client.remoteAddress(), ((InetSocketAddress)client.remoteAddress()).getPort(), client);

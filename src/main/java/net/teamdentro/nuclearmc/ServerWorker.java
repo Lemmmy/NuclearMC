@@ -32,11 +32,9 @@ public class ServerWorker implements Runnable {
 	
 	@Override
 	public void run() {
-        NuclearMC.getLogger().info("Packet");
         try {
             Class<? extends IPacket> packetClass = Server.packetRegistry.get(id);
             if (packetClass == null) {
-                NuclearMC.getLogger().warning("Received invalid packet (0x" + Integer.toHexString(id) + ") from " + client.remoteAddress().toString());
                 return;
             }
 
@@ -49,7 +47,8 @@ public class ServerWorker implements Runnable {
             Packet p = ((Class<? extends Packet>)packetClass).getDeclaredConstructor(Server.class, Channel.class, ByteBuf.class).newInstance(server, client, work);
             p.handle();
         } catch (Exception e) {
-            e.printStackTrace();
+            if (!e.getMessage().toLowerCase().contains("connection was forcibly closed by the remote host"))
+                e.printStackTrace();
         }
 
         work = null;

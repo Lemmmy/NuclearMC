@@ -4,6 +4,8 @@ import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
+import java.io.IOException;
+
 /**
  * Created by Lignum on 12/04/2015.
  */
@@ -28,13 +30,13 @@ public class SPacket0ServerIdentify extends ServerPacket {
     }
 
     @Override
-    public void send() {
+    public void send() throws IOException {
         NuclearMC.getLogger().info("IDENTIFY");
-        write(getID());
-        write((byte) 0x07);
-        write(server.getServerName());
-        write(server.getMotd());
-        write(isOp() ? (byte) 0x64 : (byte) 0x00); // not op
+        getWriter().writeByte(getID());
+        getWriter().writeByte((byte) 0x07);
+        writeString(server.getServerName());
+        writeString(server.getMotd());
+        getWriter().writeByte(isOp() ? (byte) 0x64 : (byte) 0x00); // not op
         flush();
     }
 }

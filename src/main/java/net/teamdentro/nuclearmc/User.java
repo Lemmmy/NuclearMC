@@ -55,7 +55,11 @@ public class User {
         msg.setMessage(message);
         msg.setPlayerID(playerID);
         msg.setRecipient(this);
-        msg.send();
+        try {
+            msg.send();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

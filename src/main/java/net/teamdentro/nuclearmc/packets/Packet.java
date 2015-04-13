@@ -33,9 +33,9 @@ public abstract class Packet implements IPacket {
 	
 	public abstract void handle();
 	
-	protected String readString(int bytes) throws IOException {
-		byte[] b = new byte[bytes];
-		for (int i = 0; i < bytes; ++i) {
+	protected String readString() throws IOException {
+		byte[] b = new byte[64];
+		for (int i = 0; i < 64; ++i) {
 			b[i] = data.readByte();
 		}
 		return new String(b);

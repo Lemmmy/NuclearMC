@@ -4,6 +4,8 @@ import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
+import java.io.IOException;
+
 /**
  * Created by Lignum on 12/04/2015.
  */
@@ -28,9 +30,9 @@ public class SPacket0EDisconnect extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        write(getID());
-        write(reason);
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        writeString(reason);
 
         NuclearMC.getLogger().info("Disconnected " + client.getUsername() + " [" + client.getAddress().toString() + ":" + client.getPort() + "] for reason \"" + reason + "\"");
 

@@ -6,25 +6,22 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.util.ReferenceCountUtil;
 import net.teamdentro.nuclearmc.packets.*;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 
-public class Server extends ChannelInboundHandlerAdapter implements Runnable {
+public class Server implements Runnable {
 	private ServerConfig config;
-	private ServerWorkerPool workerPool;
+
+
+    private ServerWorkerPool workerPool;
 
 	private String salt;
 
@@ -68,6 +65,10 @@ public class Server extends ChannelInboundHandlerAdapter implements Runnable {
 	}
 
     private static Random rand = new Random();
+
+    public ServerWorkerPool getWorkerPool() {
+        return workerPool;
+    }
 
     public static String generateSalt() {
 		String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -196,7 +197,11 @@ public class Server extends ChannelInboundHandlerAdapter implements Runnable {
 
         SPacket0EDisconnect dc = new SPacket0EDisconnect(this, user);
         dc.setReason(reason);
-        dc.send();
+        try {
+            dc.send();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         user.getChannel().close();
     }
@@ -286,7 +291,11 @@ public class Server extends ChannelInboundHandlerAdapter implements Runnable {
 
         for (User user : users) {
             packet.setRecipient(user);
-            packet.send();
+            try {
+                packet.send();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         packet.setRecipient(originalUser);
@@ -316,13 +325,21 @@ public class Server extends ChannelInboundHandlerAdapter implements Runnable {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(Server.this);
+                            ch.pipeline().addLast(new ServerHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             f = b.bind(address, port).sync();
+            f.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (!future.isSuccess()) {
+                        NuclearMC.getLogger().severe("Failed to bind to port");
+                    }
+                }
+            });
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -348,24 +365,6 @@ public class Server extends ChannelInboundHandlerAdapter implements Runnable {
             closeServer();
         }
 	}
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        try {
-            ByteBuf buf = (ByteBuf) msg;
-
-            while (buf.isReadable()) {
-                workerPool.processPacket(buf.readByte(), buf, ctx.channel());
-            }
-        } finally {
-            ReferenceCountUtil.release(msg);
-        }
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
-    }
 
     public void closeServer() {
         NuclearMC.getLogger().info("Server closing down");

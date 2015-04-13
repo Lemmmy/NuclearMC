@@ -3,6 +3,8 @@ package net.teamdentro.nuclearmc.packets;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
+import java.io.IOException;
+
 /**
  * Created by Lignum on 12/04/2015.
  */
@@ -45,11 +47,11 @@ public class SPacket04LevelFinalise extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        write(getID());
-        write((short) width);
-        write((short)height);
-        write((short)depth);
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        getWriter().writeShort((short) width);
+        getWriter().writeShort((short) height);
+        getWriter().writeShort((short) depth);
         flush();
     }
 }

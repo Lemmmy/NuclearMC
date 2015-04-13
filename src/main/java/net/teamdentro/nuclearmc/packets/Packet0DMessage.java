@@ -44,7 +44,7 @@ public class Packet0DMessage extends Packet {
     public void handle() {
         try {
             userdata = data.readByte();
-            message = readString(64);
+            message = readString();
 
             User user = getUser();
             NuclearMC.getLogger().info(message);

@@ -1,12 +1,10 @@
 package net.teamdentro.nuclearmc.packets;
 
+import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by Lignum on 12/04/2015.
@@ -16,24 +14,32 @@ public class SPacket03LevelData extends ServerPacket {
         super(server, client);
     }
 
-    private byte[] blocks;
+    private short length;
+    private byte[] chunk;
+    private int progress;
 
-    public byte[] getBlocks() {
-        return blocks;
+    public short getLength() {
+        return length;
     }
 
-    public void setBlocks(byte[] blocks) {
-        this.blocks = blocks;
+    public void setLength(short length) {
+        this.length = length;
     }
 
-    private int completeness;
-
-    public int getCompleteness() {
-        return completeness;
+    public byte[] getChunk() {
+        return chunk;
     }
 
-    public void setCompleteness(int completeness) {
-        this.completeness = completeness;
+    public void setChunk(byte[] chunk) {
+        this.chunk = chunk;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
     }
 
     @Override
@@ -42,44 +48,12 @@ public class SPacket03LevelData extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            GZIPOutputStream gzip = new GZIPOutputStream(bos);
-            DataOutputStream dos = new DataOutputStream(gzip);
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        getWriter().writeShort(getLength());
+        getWriter().write(getChunk());
+        getWriter().writeByte((byte) getProgress());
 
-            dos.writeInt(blocks.length);
-            dos.write(blocks);
-
-            dos.close();
-            gzip.close();
-            bos.close();
-
-            byte[] data = bos.toByteArray();
-            float chunks = data.length / 1024;
-            float sent = 0;
-
-            for (int i = 0; i < data.length; i += 1024) {
-                byte[] chunk = new byte[1024];
-
-                short length = 1024;
-                if (data.length - i < length) {
-                    length = (short) (data.length - i);
-                }
-
-                System.arraycopy(data, i, chunk, 0, length);
-
-                write(getID());
-                write(length);
-                write(chunk);
-                write((int) (sent / chunks) * 255);
-
-                sent++;
-            }
-
-            flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        flush(/*your dad*/);
     }
 }

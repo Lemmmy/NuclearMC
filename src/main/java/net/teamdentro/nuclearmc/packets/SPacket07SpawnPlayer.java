@@ -3,6 +3,8 @@ package net.teamdentro.nuclearmc.packets;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
+import java.io.IOException;
+
 /**
  * Created by Lignum on 12/04/2015.
  */
@@ -78,15 +80,15 @@ public class SPacket07SpawnPlayer extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        write(getID());
-        write(playerID);
-        write(name);
-        write((short) x);
-        write((short) y);
-        write((short) z);
-        write((byte) yaw);
-        write((byte) pitch);
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        getWriter().writeByte(playerID);
+        writeString(name);
+        getWriter().writeShort((short) x);
+        getWriter().writeShort((short) y);
+        getWriter().writeShort((short) z);
+        getWriter().writeByte((byte) yaw);
+        getWriter().writeByte((byte) pitch);
         flush();
     }
 }

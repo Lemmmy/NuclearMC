@@ -1,7 +1,10 @@
 package net.teamdentro.nuclearmc.packets;
 
+import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+
+import java.io.IOException;
 
 /**
  * Created by Lignum on 12/04/2015.
@@ -36,10 +39,10 @@ public class SPacket0DChatMessage extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        write(getID());
-        write(playerID);
-        write(message);
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        getWriter().writeByte(playerID);
+        writeString(message);
 
         flush();
     }

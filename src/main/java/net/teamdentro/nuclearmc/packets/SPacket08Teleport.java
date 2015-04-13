@@ -3,6 +3,8 @@ package net.teamdentro.nuclearmc.packets;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
+import java.io.IOException;
+
 /**
  * Created by Lignum on 12/04/2015.
  */
@@ -61,14 +63,14 @@ public class SPacket08Teleport extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        write(getID());
-        write((byte) -1);
-        write((short) x);
-        write((short) y);
-        write((short) z);
-        write((byte) yaw);
-        write((byte) pitch);
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        getWriter().writeByte((byte) -1);
+        getWriter().writeShort((short) x);
+        getWriter().writeShort((short) y);
+        getWriter().writeShort((short) z);
+        getWriter().writeByte((byte) yaw);
+        getWriter().writeByte((byte) pitch);
         flush();
     }
 }
