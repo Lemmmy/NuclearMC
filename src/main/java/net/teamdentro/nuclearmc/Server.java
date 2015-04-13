@@ -5,13 +5,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import net.teamdentro.nuclearmc.packets.*;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
-public class Server implements Runnable {
+public class Server extends SimpleChannelHandler implements Runnable {
 	//private DatagramSocket socket;
 	private ServerConfig config;
 	private ServerWorkerPool workerPool;
@@ -235,18 +240,6 @@ public class Server implements Runnable {
         this.level = level;
     }
 
-    private ServerSocket socket;
-
-	public void socketLoop() {
-		try {
-			Socket client = socket.accept();
-            DataInputStream dis = new DataInputStream(client.getInputStream());
-            workerPool.processPacket(dis.readByte(), dis, client);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	private float heartbeatTimer;
     private String serverURL = "";
 
@@ -305,33 +298,30 @@ public class Server implements Runnable {
 		running = true;
 
 		try {
-			socket = new ServerSocket();
-            socket.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
+            ChannelFactory factory = new NioServerSocketChannelFactory(
+                    Executors.newCachedThreadPool(),
+                    Executors.newCachedThreadPool()
+            );
+
+            ServerBootstrap bootstrap = new ServerBootstrap(factory);
+
+            bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+                @Override
+                public ChannelPipeline getPipeline() throws Exception {
+                    return Channels.pipeline(Server.this);
+                }
+            });
+
+            bootstrap.setOption("child.tcpNoDelay", true);
+            bootstrap.setOption("child.keepAlive", true);
+
+            bootstrap.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
+            System.out.println("Server Started!");
 		} catch (IOException e) {
 			NuclearMC.getLogger().severe("Error while binding socket! Is the port in use?");
 		}
 
 		salt = generateSalt();
-
-		Thread socketThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (running) {
-					socketLoop();
-				}
-			}
-		});
-		socketThread.start();
-
-        Thread messageThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (running) {
-                    messageLoop();
-                }
-            }
-        });
-        messageThread.start();
 
 		long lastTime = System.currentTimeMillis();
 
@@ -351,23 +341,17 @@ public class Server implements Runnable {
 		}
 	}
 
-    public void messageLoop() {
-        for (int i = 0; i > users.size(); i++) {
-            User user = users.get(i);
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+        super.exceptionCaught(ctx, e);
+    }
 
-            Socket sock = user.getSocket();
+    @Override
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        ChannelBuffer buf = (ChannelBuffer) e.getMessage();
 
-            try {
-                InputStream is = sock.getInputStream();
-                DataInputStream dis = new DataInputStream(is);
-
-                byte id;
-                while ((id = dis.readByte()) != -1) {
-                    workerPool.processPacket(id, dis, sock);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        while(buf.readable()) {
+            workerPool.processPacket(buf.readByte(), buf, e.getChannel());
         }
     }
 }

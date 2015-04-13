@@ -1,9 +1,7 @@
 package net.teamdentro.nuclearmc;
 
-import java.io.DataInputStream;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.Socket;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.channel.Channel;
 
 public class ServerWorkerPool {
 	private ServerWorker[] workers;
@@ -18,7 +16,7 @@ public class ServerWorkerPool {
 		}
 	}
 	
-	public void processPacket(byte id, DataInputStream packet, Socket client) {
+	public void processPacket(byte id, ChannelBuffer packet, Channel client) {
 		for (ServerWorker worker : workers) {
 			if (!worker.isBusy()) {
 				worker.process(id, packet, client);

@@ -3,15 +3,15 @@ package net.teamdentro.nuclearmc.packets;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import org.jboss.netty.channel.Channel;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * Created by Lignum on 12/04/2015.
  */
 public class Packet0DMessage extends Packet {
-    public Packet0DMessage(Server server, Socket client) {
+    public Packet0DMessage(Server server, Channel client) {
         super(server, client);
     }
 

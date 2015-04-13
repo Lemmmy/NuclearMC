@@ -1,14 +1,12 @@
 package net.teamdentro.nuclearmc.packets;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
-import net.teamdentro.nuclearmc.User;
+import org.jboss.netty.channel.Channel;
 
 import java.io.IOException;
-import java.net.Socket;
 
 public class Packet08Teleport extends Packet {
-    public Packet08Teleport(Server server, Socket client) {
+    public Packet08Teleport(Server server, Channel client) {
         super(server, client);
     }
 
