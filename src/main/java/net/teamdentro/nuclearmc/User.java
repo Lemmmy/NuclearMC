@@ -1,38 +1,26 @@
 package net.teamdentro.nuclearmc;
 
 import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
+import org.jboss.netty.channel.Channel;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.SocketAddress;
 
 /**
  * Created by Lignum on 12/04/2015.
  */
 public class User {
-    private InetAddress sender;
+    private SocketAddress sender;
     private int port;
-    private DataInputStream inputStream;
-    private DataOutputStream outputStream;
     private String username;
-    private Socket socket;
+    private Channel socket;
     private byte playerID;
 
-    public User(String username, InetAddress sender, int port, Socket socket) {
+    public User(String username, SocketAddress sender, int port, Channel socket) {
         this.sender = sender;
         this.port = port;
-
-        if (socket != null) {
-            try {
-                this.inputStream = new DataInputStream(socket.getInputStream());
-                this.outputStream = new DataOutputStream(socket.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         this.socket = socket;
         this.username = username;
     }
@@ -45,24 +33,16 @@ public class User {
         this.playerID = playerID;
     }
 
-    public Socket getSocket() {
+    public Channel getChannel() {
         return socket;
     }
 
-    public InetAddress getAddress() {
+    public SocketAddress getAddress() {
         return sender;
     }
 
     public int getPort() {
         return port;
-    }
-
-    public DataInputStream getInputStream() {
-        return inputStream;
-    }
-
-    public DataOutputStream getOutputStream() {
-        return outputStream;
     }
 
     public String getUsername() {

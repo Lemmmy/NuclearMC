@@ -2,6 +2,7 @@ package net.teamdentro.nuclearmc.packets;
 
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import org.jboss.netty.buffer.ChannelBuffer;
 
 import java.io.IOException;
 
@@ -48,13 +49,9 @@ public class SPacket04LevelFinalise extends ServerPacket {
 
     @Override
     public void send() {
-        try {
-            data.writeByte(getID());
-            data.writeShort(width);
-            data.writeShort(height);
-            data.writeShort(depth);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.getChannel().write(getID());
+        client.getChannel().write((short) width);
+        client.getChannel().write((short)height);
+        client.getChannel().write((short)depth);
     }
 }

@@ -3,6 +3,7 @@ package net.teamdentro.nuclearmc.packets;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import org.jboss.netty.buffer.ChannelBuffer;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -32,13 +33,9 @@ public class SPacket0EDisconnect extends ServerPacket {
 
     @Override
     public void send() {
-        try {
-            data.writeByte(getID());
-            writeString(reason);
+        client.getChannel().write(getID());
+        writeString(reason);
 
-            NuclearMC.getLogger().info("Disconnected " + client.getUsername() + " [" + client.getAddress().toString() + ":" + client.getPort() + "] for reason \"" + reason + "\"");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        NuclearMC.getLogger().info("Disconnected " + client.getUsername() + " [" + client.getAddress().toString() + ":" + client.getPort() + "] for reason \"" + reason + "\"");
     }
 }

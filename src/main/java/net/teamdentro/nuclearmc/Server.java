@@ -1,9 +1,7 @@
 package net.teamdentro.nuclearmc;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.net.*;
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
@@ -188,11 +186,7 @@ public class Server extends SimpleChannelHandler implements Runnable {
         dc.setReason(reason);
         dc.send();
 
-        try {
-            user.getSocket().close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        user.getChannel().close();
     }
 
     public void kickPlayer(String player, String reason) {
@@ -268,7 +262,7 @@ public class Server extends SimpleChannelHandler implements Runnable {
 
         for (int i = 0; i < users.size(); ++i) {
             User user = users.get(i);
-            if (user.getSocket().isClosed()) {
+            if (!user.getChannel().isOpen()) {
                 users.remove(i);
                 NuclearMC.getLogger().info(user.getUsername() + " has disconnected.");
             }
@@ -297,29 +291,25 @@ public class Server extends SimpleChannelHandler implements Runnable {
 		NuclearMC.getLogger().info("Starting server on port " + config.getInt("ServerPort", 25565));
 		running = true;
 
-		try {
-            ChannelFactory factory = new NioServerSocketChannelFactory(
-                    Executors.newCachedThreadPool(),
-                    Executors.newCachedThreadPool()
-            );
+        ChannelFactory factory = new NioServerSocketChannelFactory(
+                Executors.newCachedThreadPool(),
+                Executors.newCachedThreadPool()
+        );
 
-            ServerBootstrap bootstrap = new ServerBootstrap(factory);
+        ServerBootstrap bootstrap = new ServerBootstrap(factory);
 
-            bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-                @Override
-                public ChannelPipeline getPipeline() throws Exception {
-                    return Channels.pipeline(Server.this);
-                }
-            });
+        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+            @Override
+            public ChannelPipeline getPipeline() throws Exception {
+                return Channels.pipeline(Server.this);
+            }
+        });
 
-            bootstrap.setOption("child.tcpNoDelay", true);
-            bootstrap.setOption("child.keepAlive", true);
+        bootstrap.setOption("child.tcpNoDelay", true);
+        bootstrap.setOption("child.keepAlive", true);
 
-            bootstrap.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
-            System.out.println("Server Started!");
-		} catch (IOException e) {
-			NuclearMC.getLogger().severe("Error while binding socket! Is the port in use?");
-		}
+        bootstrap.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
+        System.out.println("Server Started!");
 
 		salt = generateSalt();
 

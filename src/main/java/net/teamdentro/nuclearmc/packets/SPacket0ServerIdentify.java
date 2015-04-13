@@ -3,6 +3,7 @@ package net.teamdentro.nuclearmc.packets;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import org.jboss.netty.buffer.ChannelBuffer;
 
 import java.io.IOException;
 
@@ -31,14 +32,10 @@ public class SPacket0ServerIdentify extends ServerPacket {
 
     @Override
     public void send() {
-        try {
-            data.writeByte(getID());
-            data.writeByte(0x07);
-            writeString(server.getServerName());
-            writeString(server.getMotd());
-            data.writeByte(isOp() ? 0x64 : 0x00); // not op
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.getChannel().write(getID());
+        client.getChannel().write((byte) 0x07);
+        writeString(server.getServerName());
+        writeString(server.getMotd());
+        client.getChannel().write(isOp() ? (byte)0x64 : (byte)0x00); // not op
     }
 }

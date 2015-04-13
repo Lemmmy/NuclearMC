@@ -2,6 +2,7 @@ package net.teamdentro.nuclearmc.packets;
 
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import org.jboss.netty.buffer.ChannelBuffer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -69,10 +70,10 @@ public class SPacket03LevelData extends ServerPacket {
 
                 System.arraycopy(data, i, chunk, 0, length);
 
-                this.data.writeByte(getID());
-                this.data.writeShort(length);
-                this.data.write(chunk);
-                this.data.write((int)(sent / chunks) * 255);
+                client.getChannel().write(getID());
+                client.getChannel().write(length);
+                client.getChannel().write(chunk);
+                client.getChannel().write((int) (sent / chunks) * 255);
 
                 sent++;
             }

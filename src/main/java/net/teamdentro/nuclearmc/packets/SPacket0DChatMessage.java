@@ -2,6 +2,7 @@ package net.teamdentro.nuclearmc.packets;
 
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import org.jboss.netty.buffer.ChannelBuffer;
 
 import java.io.IOException;
 
@@ -39,12 +40,8 @@ public class SPacket0DChatMessage extends ServerPacket {
 
     @Override
     public void send() {
-        try {
-            data.writeByte(getID());
-            data.writeByte(playerID);
-            writeString(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.getChannel().write(getID());
+        client.getChannel().write(playerID);
+        writeString(message);
     }
 }
