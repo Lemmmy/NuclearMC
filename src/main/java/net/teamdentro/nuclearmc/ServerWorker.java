@@ -47,7 +47,7 @@ public class ServerWorker implements Runnable {
                 NuclearMC.getLogger().warning("## Superclass: " + packetClass.getSuperclass().toString());
             }
 
-            Packet p = ((Class<? extends Packet>)packetClass).getDeclaredConstructor(Server.class, Socket.class, ChannelBuffer.class).newInstance(server, client, work);
+            Packet p = ((Class<? extends Packet>)packetClass).getDeclaredConstructor(Server.class, Channel.class, ChannelBuffer.class).newInstance(server, client, work);
             p.handle();
         } catch (Exception e) {
             e.printStackTrace();

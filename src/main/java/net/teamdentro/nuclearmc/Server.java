@@ -12,7 +12,13 @@ import net.teamdentro.nuclearmc.packets.*;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.socket.SocketChannel;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.handler.codec.serialization.ClassResolvers;
+import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
+import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
+import org.jboss.netty.handler.codec.string.StringEncoder;
+import org.jboss.netty.util.CharsetUtil;
 
 public class Server extends SimpleChannelHandler implements Runnable {
 	//private DatagramSocket socket;
@@ -32,7 +38,7 @@ public class Server extends SimpleChannelHandler implements Runnable {
 	public static void registerPacket(Class<? extends Packet> packet) {
 		Packet p;
 		try {
-			p = packet.getDeclaredConstructor(Server.class, Socket.class).newInstance(null, null);
+			p = packet.getDeclaredConstructor(Server.class, Channel.class, ChannelBuffer.class).newInstance(null, null, null);
 			byte id = p.getID();
 			packetRegistry.put(id, packet);
 		} catch (Exception e) {
@@ -43,7 +49,7 @@ public class Server extends SimpleChannelHandler implements Runnable {
     public static void registerServerPacket(Class<? extends ServerPacket> packet) {
         ServerPacket p;
         try {
-            p = packet.getDeclaredConstructor(Server.class, User.class).newInstance(null, null);
+            p = packet.getDeclaredConstructor(Server.class, User.class, ChannelBuffer.class).newInstance(null, null, null);
             byte id = p.getID();
             packetRegistry.put(id, packet);
         } catch (Exception e) {
@@ -301,7 +307,10 @@ public class Server extends SimpleChannelHandler implements Runnable {
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(Server.this);
+                ChannelPipeline p = Channels.pipeline(Server.this);
+                p.addLast("objectDecoder", new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                p.addLast("objectEncoder", new ObjectEncoder());
+                return p;
             }
         });
 
@@ -309,7 +318,6 @@ public class Server extends SimpleChannelHandler implements Runnable {
         bootstrap.setOption("child.keepAlive", true);
 
         bootstrap.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
-        System.out.println("Server Started!");
 
 		salt = generateSalt();
 
@@ -333,7 +341,9 @@ public class Server extends SimpleChannelHandler implements Runnable {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        super.exceptionCaught(ctx, e);
+        NuclearMC.getLogger().severe(e.getCause().toString());
+
+        e.getChannel().close();
     }
 
     @Override

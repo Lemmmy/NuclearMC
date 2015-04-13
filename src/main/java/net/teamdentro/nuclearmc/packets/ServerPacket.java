@@ -3,6 +3,7 @@ package net.teamdentro.nuclearmc.packets;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public abstract class ServerPacket implements IPacket {
 
         int paddingNeeded = 64 - str.length();
         for (int i = 0; i < paddingNeeded; ++i) {
-            client.getChannel().write((byte)0x00);
+            client.getChannel().write((byte) 0x00);
         }
     }
 }

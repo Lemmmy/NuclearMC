@@ -17,6 +17,7 @@ public abstract class Packet implements IPacket {
 	public Packet(Server server, Channel client, ChannelBuffer data) {
 		this.server = server;
 		this.client = client;
+		this.data = data;
     }
 
     public User getUser() {
