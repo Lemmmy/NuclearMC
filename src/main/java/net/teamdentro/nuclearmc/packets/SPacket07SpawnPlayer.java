@@ -5,18 +5,14 @@ import net.teamdentro.nuclearmc.User;
 
 import java.io.IOException;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class SPacket07SpawnPlayer extends ServerPacket {
-    public SPacket07SpawnPlayer(Server server, User client) {
-        super(server, client);
-    }
-
     private int x, y, z;
     private String name;
     private byte playerID;
     private int yaw, pitch;
+    public SPacket07SpawnPlayer(Server server, User client) {
+        super(server, client);
+    }
 
     public int getX() {
         return x;

@@ -8,19 +8,19 @@ import java.util.logging.LogRecord;
 
 public class ConsoleFormatter extends Formatter {
 
-	@Override
-	public String format(LogRecord rec) {
-		Level level = rec.getLevel();
-		String msg = rec.getMessage();
-		long tid = rec.getThreadID();
-		long ms = rec.getMillis();
-		
-		return "[" + formatDate(ms) + (tid != NuclearMC.MAIN_THREAD_ID ? " @ " + tid + "] " : "] ") + "[" + level.toString() + "] " + msg + "\n"; 
-	}
+    @Override
+    public String format(LogRecord rec) {
+        Level level = rec.getLevel();
+        String msg = rec.getMessage();
+        long tid = rec.getThreadID();
+        long ms = rec.getMillis();
 
-	private String formatDate(long ms) {
-		SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-		Date d = new Date(ms);
-		return f.format(d);
-	}
+        return "[" + formatDate(ms) + (tid != NuclearMC.MAIN_THREAD_ID ? " @ " + tid + "] " : "] ") + "[" + level.toString() + "] " + msg + "\n";
+    }
+
+    private String formatDate(long ms) {
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        Date d = new Date(ms);
+        return f.format(d);
+    }
 }

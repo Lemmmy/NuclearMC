@@ -6,10 +6,9 @@ import net.teamdentro.nuclearmc.User;
 
 import java.io.IOException;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class SPacket0ServerIdentify extends ServerPacket {
+    private boolean op;
+
     public SPacket0ServerIdentify(Server server, User client) {
         super(server, client);
     }
@@ -18,8 +17,6 @@ public class SPacket0ServerIdentify extends ServerPacket {
     public byte getID() {
         return 0x00;
     }
-
-    private boolean op;
 
     public boolean isOp() {
         return op;

@@ -8,10 +8,10 @@ import net.teamdentro.nuclearmc.User;
 
 import java.io.IOException;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class Packet0DMessage extends Packet {
+    private byte userdata;
+    private String message;
+
     public Packet0DMessage(Server server, Channel client, ByteBuf data) {
         super(server, client, data);
     }
@@ -20,9 +20,6 @@ public class Packet0DMessage extends Packet {
     public byte getID() {
         return 0x0D;
     }
-
-    private byte userdata;
-    private String message;
 
     public byte getUserdata() {
         return userdata;

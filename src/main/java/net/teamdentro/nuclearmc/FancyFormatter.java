@@ -14,57 +14,56 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 public class FancyFormatter extends Formatter {
-	private static String head = null;
-	private static String tail = null;
-	
-	private static Map<Level, String> levelTagMap = new HashMap<>();
-	
-	public FancyFormatter() {
-		if (levelTagMap.isEmpty()) {
-			levelTagMap.put(Level.SEVERE, "b");
-			levelTagMap.put(Level.WARNING, "i");
-			levelTagMap.put(Level.INFO, "u");
-			levelTagMap.put(Level.CONFIG, "p");
-		}
-		
-		if (head == null || tail == null) {
-			try (	InputStream stream = getClass().getResourceAsStream("/log_template.html");
-					BufferedReader reader = new BufferedReader(new InputStreamReader(stream))	) {
-				head = reader.readLine();
-				tail = reader.readLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private SimpleDateFormat headDateFormat = new SimpleDateFormat("yyyy/MM/dd");
-	
-	@Override
-	public String getHead(Handler h) {
-		return head.replace("{date}", headDateFormat.format(new Date()));
-	}
+    private static String head = null;
+    private static String tail = null;
 
-	@Override
-	public String getTail(Handler h) {
-		return tail;
-	}
-	
-	private String formatDate(long ms) {
-		SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-		Date d = new Date(ms);
-		return f.format(d);
-	}
+    private static Map<Level, String> levelTagMap = new HashMap<>();
+    private SimpleDateFormat headDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-	@Override
-	public String format(LogRecord rec) {
-		String html = "<div>";
-		html += formatDate(rec.getMillis());
-		String tag = levelTagMap.get(rec.getLevel());
-		html += "<" + tag + ">";
-		html += rec.getMessage();
-		html += "</" + tag + ">";
-		html += "</div>";
-		return html;
-	}
+    public FancyFormatter() {
+        if (levelTagMap.isEmpty()) {
+            levelTagMap.put(Level.SEVERE, "b");
+            levelTagMap.put(Level.WARNING, "i");
+            levelTagMap.put(Level.INFO, "u");
+            levelTagMap.put(Level.CONFIG, "p");
+        }
+
+        if (head == null || tail == null) {
+            try (InputStream stream = getClass().getResourceAsStream("/log_template.html");
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+                head = reader.readLine();
+                tail = reader.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public String getHead(Handler h) {
+        return head.replace("{date}", headDateFormat.format(new Date()));
+    }
+
+    @Override
+    public String getTail(Handler h) {
+        return tail;
+    }
+
+    private String formatDate(long ms) {
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        Date d = new Date(ms);
+        return f.format(d);
+    }
+
+    @Override
+    public String format(LogRecord rec) {
+        String html = "<div>";
+        html += formatDate(rec.getMillis());
+        String tag = levelTagMap.get(rec.getLevel());
+        html += "<" + tag + ">";
+        html += rec.getMessage();
+        html += "</" + tag + ">";
+        html += "</div>";
+        return html;
+    }
 }

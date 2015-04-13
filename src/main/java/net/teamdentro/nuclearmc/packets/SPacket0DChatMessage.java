@@ -1,15 +1,14 @@
 package net.teamdentro.nuclearmc.packets;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
 import java.io.IOException;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class SPacket0DChatMessage extends ServerPacket {
+    private byte playerID;
+    private String message;
+
     public SPacket0DChatMessage(Server server, User client) {
         super(server, client);
     }
@@ -18,9 +17,6 @@ public class SPacket0DChatMessage extends ServerPacket {
     public byte getID() {
         return 0x0D;
     }
-
-    private byte playerID;
-    private String message;
 
     public byte getPlayerID() {
         return playerID;

@@ -10,45 +10,45 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class Packet0Connect extends Packet {
-	private byte protVersion;
-	private String username;
-	private String key;
-	private byte userdata;
-	
-	public Packet0Connect(Server server, Channel client, ByteBuf data) {
-		super(server, client, data);
-	}
+    private byte protVersion;
+    private String username;
+    private String key;
+    private byte userdata;
 
-	public byte getProtVersion() {
-		return protVersion;
-	}
+    public Packet0Connect(Server server, Channel client, ByteBuf data) {
+        super(server, client, data);
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public byte getProtVersion() {
+        return protVersion;
+    }
 
-	public String getKey() {
-		return key;
-	}
-	
-	public byte getUserdata() {
-		return userdata;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	@Override
-	public byte getID() {
-		return (byte)0x0;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	@Override
-	public void handle() {
-		try {
-			protVersion = data.readByte();
-			username = readString().trim();
-			key = readString().trim();
-			userdata = data.readByte();
+    public byte getUserdata() {
+        return userdata;
+    }
 
-            User user = new User(username, (InetSocketAddress)client.remoteAddress(), ((InetSocketAddress)client.remoteAddress()).getPort(), client);
+    @Override
+    public byte getID() {
+        return (byte) 0x0;
+    }
+
+    @Override
+    public void handle() {
+        try {
+            protVersion = data.readByte();
+            username = readString().trim();
+            key = readString().trim();
+            userdata = data.readByte();
+
+            User user = new User(username, (InetSocketAddress) client.remoteAddress(), ((InetSocketAddress) client.remoteAddress()).getPort(), client);
             user.setPlayerID(server.makeUniquePlayerID());
             server.addUser(user);
 
@@ -71,8 +71,8 @@ public class Packet0Connect extends Packet {
             spawn.send();
 
             user.sendMessage("Welcome to the server!");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -10,13 +10,11 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.zip.GZIPOutputStream;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class Level {
     private byte[] blocks;
     private int width, height, depth;
     private int spawnX, spawnY, spawnZ;
+    private Random rand = new Random();
 
     public Level() {
         width = 128;
@@ -33,14 +31,12 @@ public class Level {
     }
 
     public void setBlock(int x, int y, int z, int id) {
-        blocks[getIndex(x, y, z)] = (byte)id;
+        blocks[getIndex(x, y, z)] = (byte) id;
     }
 
     public int getIndex(int x, int y, int z) {
         return (y * depth + z) * width + x;
     }
-
-    private Random rand = new Random();
 
     public void generateFlatland() {
         for (int y = 0; y < 8; ++y) {
@@ -117,7 +113,7 @@ public class Level {
                 SPacket03LevelData packet = new SPacket03LevelData(server, user);
                 packet.setLength(length);
                 packet.setChunk(chunk);
-                packet.setProgress((int)((sent / chunks) * 255));
+                packet.setProgress((int) ((sent / chunks) * 255));
                 packet.send();
 
                 sent++;

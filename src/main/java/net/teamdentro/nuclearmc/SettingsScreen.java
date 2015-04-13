@@ -17,8 +17,6 @@ public class SettingsScreen extends JFrame {
     private GUI parent;
 
     private Image icon;
-    private TrayIcon trayIcon;
-    private SystemTray tray;
 
     private JTabbedPane tabs;
 
@@ -63,7 +61,7 @@ public class SettingsScreen extends JFrame {
     }
 
     public void addSettingsScreen(String name, LuaTable table) {
-        GridLayout gridLayout =  new GridLayout(0, 2, 8, 8);
+        GridLayout gridLayout = new GridLayout(0, 2, 8, 8);
         JPanel mainPanel = new JPanel(gridLayout);
         JScrollPane scrollPane = new JScrollPane(mainPanel);
 
@@ -83,7 +81,7 @@ public class SettingsScreen extends JFrame {
     }
 
     public enum SettingType {
-        BOOLEAN, INT, DOUBLE, STRING;
+        BOOLEAN, INT, DOUBLE, STRING
     }
 
     public class Setting {

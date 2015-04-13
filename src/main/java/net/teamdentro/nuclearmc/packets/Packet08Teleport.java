@@ -5,16 +5,15 @@ import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.Server;
 
 public class Packet08Teleport extends Packet {
-    public Packet08Teleport(Server server, Channel client, ByteBuf data) {
-        super(server, client, data);
-    }
-
     private byte player;
     private short posx;
     private short posy;
     private short posz;
     private byte yaw;
     private byte pitch;
+    public Packet08Teleport(Server server, Channel client, ByteBuf data) {
+        super(server, client, data);
+    }
 
     public byte getPlayer() {
         return player;

@@ -1,22 +1,17 @@
 package net.teamdentro.nuclearmc.packets;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
 import java.io.IOException;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class SPacket03LevelData extends ServerPacket {
-    public SPacket03LevelData(Server server, User client) {
-        super(server, client);
-    }
-
     private short length;
     private byte[] chunk;
     private int progress;
+    public SPacket03LevelData(Server server, User client) {
+        super(server, client);
+    }
 
     public short getLength() {
         return length;

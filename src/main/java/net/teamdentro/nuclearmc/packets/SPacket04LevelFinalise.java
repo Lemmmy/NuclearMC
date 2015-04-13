@@ -5,17 +5,13 @@ import net.teamdentro.nuclearmc.User;
 
 import java.io.IOException;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class SPacket04LevelFinalise extends ServerPacket {
-    public SPacket04LevelFinalise(Server server, User client) {
-        super(server, client);
-    }
-
     private int width;
     private int height;
     private int depth;
+    public SPacket04LevelFinalise(Server server, User client) {
+        super(server, client);
+    }
 
     public int getWidth() {
         return width;

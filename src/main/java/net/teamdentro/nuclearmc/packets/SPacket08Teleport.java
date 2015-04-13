@@ -5,10 +5,10 @@ import net.teamdentro.nuclearmc.User;
 
 import java.io.IOException;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class SPacket08Teleport extends ServerPacket {
+    private int x, y, z;
+    private int yaw, pitch;
+
     public SPacket08Teleport(Server server, User client) {
         super(server, client);
     }
@@ -17,8 +17,6 @@ public class SPacket08Teleport extends ServerPacket {
     public byte getID() {
         return 0x08;
     }
-
-    private int x, y, z;
 
     public int getX() {
         return x;
@@ -43,8 +41,6 @@ public class SPacket08Teleport extends ServerPacket {
     public void setZ(int z) {
         this.z = z;
     }
-
-    private int yaw, pitch;
 
     public int getYaw() {
         return yaw;

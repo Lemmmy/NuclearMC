@@ -183,7 +183,7 @@ public class GUI extends JFrame {
         sidebarArea = new JPanel(new BorderLayout());
         extendableSidebarArea = new JPanel();
         extendableSidebarArea.setLayout(new GridLayout());
-        ((GridLayout)extendableSidebarArea.getLayout()).setRows(1);
+        ((GridLayout) extendableSidebarArea.getLayout()).setRows(1);
 
         inputField = new JTextField();
         consoleArea.add(inputField, BorderLayout.PAGE_END);
@@ -231,6 +231,7 @@ public class GUI extends JFrame {
 
     /**
      * Get the GUI's sidebar. Used for plugins
+     *
      * @return The GUI's sidebar, as a JPanel
      */
     public JPanel getSidebar() {

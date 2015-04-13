@@ -1,8 +1,6 @@
 package net.teamdentro.nuclearmc;
 
 import javax.swing.*;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Handler;

@@ -5,9 +5,6 @@ import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
 
 import java.net.InetSocketAddress;
 
-/**
- * Created by Lignum on 12/04/2015.
- */
 public class User {
     private InetSocketAddress sender;
     private int port;
@@ -68,7 +65,7 @@ public class User {
             return false;
         }
 
-        User user = (User)obj;
+        User user = (User) obj;
         return user.getUsername().equals(username);
     }
 }
