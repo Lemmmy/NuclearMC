@@ -1,18 +1,19 @@
 package net.teamdentro.nuclearmc.packets;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * Created by Lignum on 12/04/2015.
  */
 public class Packet0DMessage extends Packet {
-    public Packet0DMessage(Server server, Socket client) {
-        super(server, client);
+    public Packet0DMessage(Server server, Channel client, ByteBuf data) {
+        super(server, client, data);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class Packet0DMessage extends Packet {
     public void handle() {
         try {
             userdata = data.readByte();
-            message = readString(64);
+            message = readString();
 
             User user = getUser();
             NuclearMC.getLogger().info(message);

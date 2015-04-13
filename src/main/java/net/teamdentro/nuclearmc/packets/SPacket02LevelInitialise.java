@@ -19,11 +19,8 @@ public class SPacket02LevelInitialise extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        try {
-            data.writeByte(getID());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        flush();
     }
 }

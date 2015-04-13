@@ -4,7 +4,11 @@ import net.teamdentro.nuclearmc.packets.SPacket02LevelInitialise;
 import net.teamdentro.nuclearmc.packets.SPacket03LevelData;
 import net.teamdentro.nuclearmc.packets.SPacket04LevelFinalise;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Random;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by Lignum on 12/04/2015.
@@ -78,16 +82,58 @@ public class Level {
 
     public void sendToUser(Server server, User user) {
         SPacket02LevelInitialise init = new SPacket02LevelInitialise(server, user);
-        init.send();
+        try {
+            init.send();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        SPacket03LevelData data = new SPacket03LevelData(server, user);
-        data.setBlocks(blocks);
-        data.send();
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            GZIPOutputStream gzip = new GZIPOutputStream(bos);
+            DataOutputStream dos = new DataOutputStream(gzip);
+
+            dos.writeInt(blocks.length);
+            dos.write(blocks);
+
+            dos.close();
+            gzip.close();
+            bos.close();
+
+            byte[] data = bos.toByteArray();
+            float chunks = data.length / 1024;
+            float sent = 0;
+
+            for (int i = 0; i < data.length; i += 1024) {
+                byte[] chunk = new byte[1024];
+
+                short length = 1024;
+                if (data.length - i < length) {
+                    length = (short) (data.length - i);
+                }
+
+                System.arraycopy(data, i, chunk, 0, length);
+
+                SPacket03LevelData packet = new SPacket03LevelData(server, user);
+                packet.setLength(length);
+                packet.setChunk(chunk);
+                packet.setProgress((int)((sent / chunks) * 255));
+                packet.send();
+
+                sent++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         SPacket04LevelFinalise finalise = new SPacket04LevelFinalise(server, user);
         finalise.setWidth(width);
         finalise.setHeight(height);
         finalise.setDepth(depth);
-        finalise.send();
+        try {
+            finalise.send();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

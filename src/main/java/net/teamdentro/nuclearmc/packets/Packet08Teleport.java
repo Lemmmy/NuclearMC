@@ -1,15 +1,12 @@
 package net.teamdentro.nuclearmc.packets;
 
-import net.teamdentro.nuclearmc.NuclearMC;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.Server;
-import net.teamdentro.nuclearmc.User;
-
-import java.io.IOException;
-import java.net.Socket;
 
 public class Packet08Teleport extends Packet {
-    public Packet08Teleport(Server server, Socket client) {
-        super(server, client);
+    public Packet08Teleport(Server server, Channel client, ByteBuf data) {
+        super(server, client, data);
     }
 
     private byte player;
@@ -74,15 +71,11 @@ public class Packet08Teleport extends Packet {
 
     @Override
     public void handle() {
-        try {
-            player = data.readByte();
-            posx = data.readShort();
-            posy = data.readShort();
-            posz = data.readShort();
-            yaw = data.readByte();
-            pitch = data.readByte();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        player = data.readByte();
+        posx = data.readShort();
+        posy = data.readShort();
+        posz = data.readShort();
+        yaw = data.readByte();
+        pitch = data.readByte();
     }
 }

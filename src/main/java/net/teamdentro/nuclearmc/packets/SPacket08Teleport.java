@@ -1,6 +1,5 @@
 package net.teamdentro.nuclearmc.packets;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
@@ -64,17 +63,14 @@ public class SPacket08Teleport extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        try {
-            data.writeByte(getID());
-            data.writeByte(-1);
-            data.writeShort(x);
-            data.writeShort(y);
-            data.writeShort(z);
-            data.writeByte(yaw);
-            data.writeByte(pitch);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        getWriter().writeByte((byte) -1);
+        getWriter().writeShort((short) x);
+        getWriter().writeShort((short) y);
+        getWriter().writeShort((short) z);
+        getWriter().writeByte((byte) yaw);
+        getWriter().writeByte((byte) pitch);
+        flush();
     }
 }

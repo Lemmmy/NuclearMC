@@ -1,18 +1,26 @@
 package net.teamdentro.nuclearmc;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import net.teamdentro.nuclearmc.packets.*;
+
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.logging.FileHandler;
 
-import javax.net.ssl.HttpsURLConnection;
-
-import net.teamdentro.nuclearmc.packets.*;
-
 public class Server implements Runnable {
-	//private DatagramSocket socket;
 	private ServerConfig config;
-	private ServerWorkerPool workerPool;
+
+
+    private ServerWorkerPool workerPool;
 
 	private String salt;
 
@@ -24,10 +32,15 @@ public class Server implements Runnable {
 
     public static Server instance;
 
-	public static void registerPacket(Class<? extends Packet> packet) {
+    private ChannelFuture f;
+
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+
+    public static void registerPacket(Class<? extends Packet> packet) {
 		Packet p;
 		try {
-			p = packet.getDeclaredConstructor(Server.class, Socket.class).newInstance(null, null);
+			p = packet.getDeclaredConstructor(Server.class, Channel.class, ByteBuf.class).newInstance(null, null, null);
 			byte id = p.getID();
 			packetRegistry.put(id, packet);
 		} catch (Exception e) {
@@ -38,7 +51,7 @@ public class Server implements Runnable {
     public static void registerServerPacket(Class<? extends ServerPacket> packet) {
         ServerPacket p;
         try {
-            p = packet.getDeclaredConstructor(Server.class, User.class).newInstance(null, null);
+            p = packet.getDeclaredConstructor(Server.class, User.class, ByteBuf.class).newInstance(null, null, null);
             byte id = p.getID();
             packetRegistry.put(id, packet);
         } catch (Exception e) {
@@ -51,6 +64,10 @@ public class Server implements Runnable {
 	}
 
     private static Random rand = new Random();
+
+    public ServerWorkerPool getWorkerPool() {
+        return workerPool;
+    }
 
     public static String generateSalt() {
 		String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -179,13 +196,13 @@ public class Server implements Runnable {
 
         SPacket0EDisconnect dc = new SPacket0EDisconnect(this, user);
         dc.setReason(reason);
-        dc.send();
-
         try {
-            user.getSocket().close();
+            dc.send();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        user.getChannel().close();
     }
 
     public void kickPlayer(String player, String reason) {
@@ -233,18 +250,6 @@ public class Server implements Runnable {
         this.level = level;
     }
 
-    private ServerSocket socket;
-
-	public void socketLoop() {
-		try {
-			Socket client = socket.accept();
-            DataInputStream dis = new DataInputStream(client.getInputStream());
-            workerPool.processPacket(dis.readByte(), dis, client);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	private float heartbeatTimer;
     private String serverURL = "";
 
@@ -273,7 +278,7 @@ public class Server implements Runnable {
 
         for (int i = 0; i < users.size(); ++i) {
             User user = users.get(i);
-            if (user.getSocket().isClosed()) {
+            if (!user.getChannel().isOpen()) {
                 users.remove(i);
                 NuclearMC.getLogger().info(user.getUsername() + " has disconnected.");
             }
@@ -285,7 +290,11 @@ public class Server implements Runnable {
 
         for (User user : users) {
             packet.setRecipient(user);
-            packet.send();
+            try {
+                packet.send();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         packet.setRecipient(originalUser);
@@ -299,77 +308,77 @@ public class Server implements Runnable {
 
 	@Override
 	public void run() {
-		NuclearMC.getLogger().info("Starting server on port " + config.getInt("ServerPort", 25565));
+        String address = config.getValue("ServerIP", "0.0.0.0");
+        int port = config.getInt("ServerPort", 25565);
+
+        NuclearMC.getLogger().info("Starting server on port " + port);
 		running = true;
 
-		try {
-			socket = new ServerSocket();
-            socket.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
-		} catch (IOException e) {
-			NuclearMC.getLogger().severe("Error while binding socket! Is the port in use?");
-		}
+        try {
+            bossGroup = new NioEventLoopGroup();
+            workerGroup = new NioEventLoopGroup();
 
-		salt = generateSalt();
+            ServerBootstrap b = new ServerBootstrap();
+            b.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new ServerHandler());
+                        }
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-		Thread socketThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (running) {
-					socketLoop();
-				}
-			}
-		});
-		socketThread.start();
+            f = b.bind(address, port).sync();
+            f.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (!future.isSuccess()) {
+                        NuclearMC.getLogger().severe("Failed to bind to port");
+                    }
+                }
+            });
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            salt = generateSalt();
 
-        Thread messageThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (running) {
-                    messageLoop();
+            long lastTime = System.currentTimeMillis();
+
+            while (running) {
+                long now = System.currentTimeMillis();
+                long dt = now - lastTime;
+
+                update(dt / 1000.0f);
+
+                lastTime = System.currentTimeMillis();
+
+                try {
+                    Thread.sleep(16);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-        });
-        messageThread.start();
 
-		long lastTime = System.currentTimeMillis();
-
-		while (running) {
-			long now = System.currentTimeMillis();
-			long dt = now - lastTime;
-
-			update(dt / 1000.0f);
-
-			lastTime = System.currentTimeMillis();
-
-			try {
-				Thread.sleep(16);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public ServerConfig getServerConfig() {
-		return config;
-	}
-
-    public void messageLoop() {
-        for (int i = 0; i > users.size(); i++) {
-            User user = users.get(i);
-
-            Socket sock = user.getSocket();
-
-            try {
-                InputStream is = sock.getInputStream();
-                DataInputStream dis = new DataInputStream(is);
-
-                byte id;
-                while ((id = dis.readByte()) != -1) {
-                    workerPool.processPacket(id, dis, sock);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            closeServer();
         }
+	}
+
+    public void closeServer() {
+        NuclearMC.getLogger().info("Server closing down");
+
+        try {
+            NuclearMC.getLogger().info("Closing Netty");
+
+            f.channel().closeFuture().sync();
+
+            workerGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
+        } catch (InterruptedException e) {
+            NuclearMC.getLogger().info("Problem closing Netty");
+            e.printStackTrace();
+        }
+
     }
 }

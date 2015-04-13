@@ -1,5 +1,6 @@
 package net.teamdentro.nuclearmc.packets;
 
+import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
@@ -38,13 +39,11 @@ public class SPacket0DChatMessage extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        try {
-            data.writeByte(getID());
-            data.writeByte(playerID);
-            writeString(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        getWriter().writeByte(playerID);
+        writeString(message);
+
+        flush();
     }
 }

@@ -1,38 +1,23 @@
 package net.teamdentro.nuclearmc;
 
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 
 /**
  * Created by Lignum on 12/04/2015.
  */
 public class User {
-    private InetAddress sender;
+    private InetSocketAddress sender;
     private int port;
-    private DataInputStream inputStream;
-    private DataOutputStream outputStream;
     private String username;
-    private Socket socket;
+    private Channel socket;
     private byte playerID;
 
-    public User(String username, InetAddress sender, int port, Socket socket) {
+    public User(String username, InetSocketAddress sender, int port, Channel socket) {
         this.sender = sender;
         this.port = port;
-
-        if (socket != null) {
-            try {
-                this.inputStream = new DataInputStream(socket.getInputStream());
-                this.outputStream = new DataOutputStream(socket.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         this.socket = socket;
         this.username = username;
     }
@@ -45,24 +30,16 @@ public class User {
         this.playerID = playerID;
     }
 
-    public Socket getSocket() {
+    public Channel getChannel() {
         return socket;
     }
 
-    public InetAddress getAddress() {
+    public InetSocketAddress getAddress() {
         return sender;
     }
 
     public int getPort() {
         return port;
-    }
-
-    public DataInputStream getInputStream() {
-        return inputStream;
-    }
-
-    public DataOutputStream getOutputStream() {
-        return outputStream;
     }
 
     public String getUsername() {
@@ -78,7 +55,11 @@ public class User {
         msg.setMessage(message);
         msg.setPlayerID(playerID);
         msg.setRecipient(this);
-        msg.send();
+        try {
+            msg.send();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

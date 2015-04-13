@@ -1,23 +1,15 @@
 package net.teamdentro.nuclearmc;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.Socket;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.packets.IPacket;
 import net.teamdentro.nuclearmc.packets.Packet;
-import net.teamdentro.nuclearmc.packets.SPacket0EDisconnect;
-import net.teamdentro.nuclearmc.packets.ServerPacket;
 
 public class ServerWorker implements Runnable {
 	private Thread workerThread;
-	private DataInputStream work;
+	private ByteBuf work;
     private Server server;
-    private Socket client;
+    private Channel client;
 
     private byte id;
 
@@ -26,7 +18,7 @@ public class ServerWorker implements Runnable {
         workerThread = new Thread(this);
 	}
 	
-	public void process(byte id, DataInputStream packet, Socket client) {
+	public void process(byte id, ByteBuf packet, Channel client) {
         work = packet;
         this.client = client;
         this.id = id;
@@ -43,7 +35,6 @@ public class ServerWorker implements Runnable {
         try {
             Class<? extends IPacket> packetClass = Server.packetRegistry.get(id);
             if (packetClass == null) {
-                NuclearMC.getLogger().warning("Received invalid packet (0x" + Integer.toHexString(id) + ") from " + client.getInetAddress().toString() + ":" + client.getPort());
                 return;
             }
 
@@ -53,10 +44,11 @@ public class ServerWorker implements Runnable {
                 NuclearMC.getLogger().warning("## Superclass: " + packetClass.getSuperclass().toString());
             }
 
-            Packet p = ((Class<? extends Packet>)packetClass).getDeclaredConstructor(Server.class, Socket.class).newInstance(server, client);
+            Packet p = ((Class<? extends Packet>)packetClass).getDeclaredConstructor(Server.class, Channel.class, ByteBuf.class).newInstance(server, client, work);
             p.handle();
         } catch (Exception e) {
-            e.printStackTrace();
+            if (!e.getMessage().toLowerCase().contains("connection was forcibly closed by the remote host"))
+                e.printStackTrace();
         }
 
         work = null;

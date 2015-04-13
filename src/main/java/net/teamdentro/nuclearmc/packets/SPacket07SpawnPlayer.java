@@ -80,18 +80,15 @@ public class SPacket07SpawnPlayer extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        try {
-            data.writeByte(getID());
-            data.writeByte(playerID);
-            writeString(name);
-            data.writeShort(x);
-            data.writeShort(y);
-            data.writeShort(z);
-            data.writeByte(yaw);
-            data.writeByte(pitch);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void send() throws IOException {
+        getWriter().writeByte(getID());
+        getWriter().writeByte(playerID);
+        writeString(name);
+        getWriter().writeShort((short) x);
+        getWriter().writeShort((short) y);
+        getWriter().writeShort((short) z);
+        getWriter().writeByte((byte) yaw);
+        getWriter().writeByte((byte) pitch);
+        flush();
     }
 }

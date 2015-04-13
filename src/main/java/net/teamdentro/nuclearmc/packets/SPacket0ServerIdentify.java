@@ -30,15 +30,13 @@ public class SPacket0ServerIdentify extends ServerPacket {
     }
 
     @Override
-    public void send() {
-        try {
-            data.writeByte(getID());
-            data.writeByte(0x07);
-            writeString(server.getServerName());
-            writeString(server.getMotd());
-            data.writeByte(isOp() ? 0x64 : 0x00); // not op
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void send() throws IOException {
+        NuclearMC.getLogger().info("IDENTIFY");
+        getWriter().writeByte(getID());
+        getWriter().writeByte((byte) 0x07);
+        writeString(server.getServerName());
+        writeString(server.getMotd());
+        getWriter().writeByte(isOp() ? (byte) 0x64 : (byte) 0x00); // not op
+        flush();
     }
 }

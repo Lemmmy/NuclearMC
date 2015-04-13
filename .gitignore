@@ -10,3 +10,8 @@ target/
 .settings/
 out/
 config.lua
+/.settings/
+.gradle
+/build
+/lib/
+/gradle/

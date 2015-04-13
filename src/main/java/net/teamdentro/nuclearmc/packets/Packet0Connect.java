@@ -1,14 +1,13 @@
 package net.teamdentro.nuclearmc.packets;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
 public class Packet0Connect extends Packet {
 	private byte protVersion;
@@ -16,8 +15,8 @@ public class Packet0Connect extends Packet {
 	private String key;
 	private byte userdata;
 	
-	public Packet0Connect(Server server, Socket client) {
-		super(server, client);
+	public Packet0Connect(Server server, Channel client, ByteBuf data) {
+		super(server, client, data);
 	}
 
 	public byte getProtVersion() {
@@ -45,11 +44,11 @@ public class Packet0Connect extends Packet {
 	public void handle() {
 		try {
 			protVersion = data.readByte();
-			username = readString(64).trim(); // WHO DID THIS AND WHY?
-			key = readString(64).trim();
+			username = readString().trim();
+			key = readString().trim();
 			userdata = data.readByte();
 
-            User user = new User(username, client.getInetAddress(), client.getPort(), client);
+            User user = new User(username, (InetSocketAddress)client.remoteAddress(), ((InetSocketAddress)client.remoteAddress()).getPort(), client);
             user.setPlayerID(server.makeUniquePlayerID());
             server.addUser(user);
 

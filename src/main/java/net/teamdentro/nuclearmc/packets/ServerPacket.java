@@ -1,8 +1,12 @@
 package net.teamdentro.nuclearmc.packets;
 
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -12,15 +16,10 @@ import java.io.IOException;
 public abstract class ServerPacket implements IPacket {
     protected Server server;
     protected User client;
-    protected DataOutputStream data;
 
     public ServerPacket(Server server, User client) {
         this.server = server;
         this.client = client;
-
-        if (client != null) {
-            data = client.getOutputStream();
-        }
     }
 
     public void setRecipient(User user) {
@@ -33,18 +32,25 @@ public abstract class ServerPacket implements IPacket {
 
     public abstract byte getID();
 
-    public abstract void send();
+    public abstract void send() throws IOException;
 
-    public void writeString(String str) {
-        try {
-            data.writeBytes(str);
+    private ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    private DataOutputStream writer = new DataOutputStream(baos);
 
-            int paddingNeeded = 64 - str.length();
-            for (int i = 0; i < paddingNeeded; ++i) {
-                data.writeByte(0x00);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public DataOutputStream getWriter() {
+        return writer;
+    }
+
+    public void writeString(String str) throws IOException {
+        getWriter().writeBytes(str);
+
+        int paddingNeeded = 64 - str.length();
+        for (int i = 0; i < paddingNeeded; ++i) {
+            getWriter().writeByte((byte) 0x00);
         }
+    }
+
+    public void flush() {
+        ChannelFuture cf = client.getChannel().writeAndFlush(Unpooled.wrappedBuffer(baos.toByteArray()));
     }
 }
