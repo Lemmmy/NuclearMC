@@ -1,24 +1,21 @@
 package net.teamdentro.nuclearmc;
 
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
-import org.jboss.netty.channel.Channel;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
 /**
  * Created by Lignum on 12/04/2015.
  */
 public class User {
-    private SocketAddress sender;
+    private InetSocketAddress sender;
     private int port;
     private String username;
     private Channel socket;
     private byte playerID;
 
-    public User(String username, SocketAddress sender, int port, Channel socket) {
+    public User(String username, InetSocketAddress sender, int port, Channel socket) {
         this.sender = sender;
         this.port = port;
         this.socket = socket;
@@ -37,7 +34,7 @@ public class User {
         return socket;
     }
 
-    public SocketAddress getAddress() {
+    public InetSocketAddress getAddress() {
         return sender;
     }
 

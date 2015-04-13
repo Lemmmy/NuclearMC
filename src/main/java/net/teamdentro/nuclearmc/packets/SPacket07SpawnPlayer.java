@@ -2,9 +2,6 @@ package net.teamdentro.nuclearmc.packets;
 
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
-import org.jboss.netty.buffer.ChannelBuffer;
-
-import java.io.IOException;
 
 /**
  * Created by Lignum on 12/04/2015.
@@ -82,13 +79,14 @@ public class SPacket07SpawnPlayer extends ServerPacket {
 
     @Override
     public void send() {
-        client.getChannel().write(getID());
-        client.getChannel().write(playerID);
-        writeString(name);
-        client.getChannel().write((short) x);
-        client.getChannel().write((short) y);
-        client.getChannel().write((short) z);
-        client.getChannel().write((byte) yaw);
-        client.getChannel().write((byte) pitch);
+        write(getID());
+        write(playerID);
+        write(name);
+        write((short) x);
+        write((short) y);
+        write((short) z);
+        write((byte) yaw);
+        write((byte) pitch);
+        flush();
     }
 }

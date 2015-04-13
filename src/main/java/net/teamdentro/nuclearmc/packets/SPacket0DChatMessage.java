@@ -2,9 +2,6 @@ package net.teamdentro.nuclearmc.packets;
 
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
-import org.jboss.netty.buffer.ChannelBuffer;
-
-import java.io.IOException;
 
 /**
  * Created by Lignum on 12/04/2015.
@@ -40,8 +37,10 @@ public class SPacket0DChatMessage extends ServerPacket {
 
     @Override
     public void send() {
-        client.getChannel().write(getID());
-        client.getChannel().write(playerID);
-        writeString(message);
+        write(getID());
+        write(playerID);
+        write(message);
+
+        flush();
     }
 }

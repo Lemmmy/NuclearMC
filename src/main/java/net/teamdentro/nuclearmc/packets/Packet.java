@@ -1,20 +1,19 @@
 package net.teamdentro.nuclearmc.packets;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
 public abstract class Packet implements IPacket {
 	protected Server server;
 	protected Channel client;
-    protected ChannelBuffer data;
+    protected ByteBuf data;
 
-	public Packet(Server server, Channel client, ChannelBuffer data) {
+	public Packet(Server server, Channel client, ByteBuf data) {
 		this.server = server;
 		this.client = client;
 		this.data = data;
@@ -22,7 +21,7 @@ public abstract class Packet implements IPacket {
 
     public User getUser() {
         for (User user : server.getOnlineUsers()) {
-            if (user.getAddress().equals(client.getRemoteAddress()) && user.getPort() == ((InetSocketAddress)client.getRemoteAddress()).getPort()) {
+            if (user.getAddress().equals(client.remoteAddress()) && user.getPort() == ((InetSocketAddress)client.remoteAddress()).getPort()) {
                 return user;
             }
         }

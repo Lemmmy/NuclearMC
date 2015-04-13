@@ -8,3 +8,7 @@ config.txt
 .classpath
 .project
 /.settings/
+.gradle
+/build
+/lib/
+/gradle/

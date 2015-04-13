@@ -1,27 +1,28 @@
 package net.teamdentro.nuclearmc;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.util.ReferenceCountUtil;
+import net.teamdentro.nuclearmc.packets.*;
+
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 
-import javax.net.ssl.HttpsURLConnection;
-
-import net.teamdentro.nuclearmc.packets.*;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.channel.socket.SocketChannel;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.handler.codec.serialization.ClassResolvers;
-import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
-import org.jboss.netty.handler.codec.string.StringEncoder;
-import org.jboss.netty.util.CharsetUtil;
-
-public class Server extends SimpleChannelHandler implements Runnable {
-	//private DatagramSocket socket;
+public class Server extends ChannelInboundHandlerAdapter implements Runnable {
 	private ServerConfig config;
 	private ServerWorkerPool workerPool;
 
@@ -35,10 +36,15 @@ public class Server extends SimpleChannelHandler implements Runnable {
 
     public static Server instance;
 
-	public static void registerPacket(Class<? extends Packet> packet) {
+    private ChannelFuture f;
+
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+
+    public static void registerPacket(Class<? extends Packet> packet) {
 		Packet p;
 		try {
-			p = packet.getDeclaredConstructor(Server.class, Channel.class, ChannelBuffer.class).newInstance(null, null, null);
+			p = packet.getDeclaredConstructor(Server.class, Channel.class, ByteBuf.class).newInstance(null, null, null);
 			byte id = p.getID();
 			packetRegistry.put(id, packet);
 		} catch (Exception e) {
@@ -49,7 +55,7 @@ public class Server extends SimpleChannelHandler implements Runnable {
     public static void registerServerPacket(Class<? extends ServerPacket> packet) {
         ServerPacket p;
         try {
-            p = packet.getDeclaredConstructor(Server.class, User.class, ChannelBuffer.class).newInstance(null, null, null);
+            p = packet.getDeclaredConstructor(Server.class, User.class, ByteBuf.class).newInstance(null, null, null);
             byte id = p.getID();
             packetRegistry.put(id, packet);
         } catch (Exception e) {
@@ -294,64 +300,87 @@ public class Server extends SimpleChannelHandler implements Runnable {
 
 	@Override
 	public void run() {
-		NuclearMC.getLogger().info("Starting server on port " + config.getInt("ServerPort", 25565));
+        String address = config.getValue("ServerIP", "0.0.0.0");
+        int port = config.getInt("ServerPort", 25565);
+
+        NuclearMC.getLogger().info("Starting server on port " + port);
 		running = true;
 
-        ChannelFactory factory = new NioServerSocketChannelFactory(
-                Executors.newCachedThreadPool(),
-                Executors.newCachedThreadPool()
-        );
+        try {
+            bossGroup = new NioEventLoopGroup();
+            workerGroup = new NioEventLoopGroup();
 
-        ServerBootstrap bootstrap = new ServerBootstrap(factory);
+            ServerBootstrap b = new ServerBootstrap();
+            b.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(Server.this);
+                        }
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-            @Override
-            public ChannelPipeline getPipeline() throws Exception {
-                ChannelPipeline p = Channels.pipeline(Server.this);
-                p.addLast("objectDecoder", new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
-                p.addLast("objectEncoder", new ObjectEncoder());
-                return p;
+            f = b.bind(address, port).sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            salt = generateSalt();
+
+            long lastTime = System.currentTimeMillis();
+
+            while (running) {
+                long now = System.currentTimeMillis();
+                long dt = now - lastTime;
+
+                update(dt / 1000.0f);
+
+                lastTime = System.currentTimeMillis();
+
+                try {
+                    Thread.sleep(16);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        });
 
-        bootstrap.setOption("child.tcpNoDelay", true);
-        bootstrap.setOption("child.keepAlive", true);
-
-        bootstrap.bind(new InetSocketAddress(config.getValue("ServerIP", "0.0.0.0"), config.getInt("ServerPort", 25565)));
-
-		salt = generateSalt();
-
-		long lastTime = System.currentTimeMillis();
-
-		while (running) {
-			long now = System.currentTimeMillis();
-			long dt = now - lastTime;
-
-			update(dt / 1000.0f);
-
-			lastTime = System.currentTimeMillis();
-
-			try {
-				Thread.sleep(16);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+            closeServer();
+        }
 	}
-
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        NuclearMC.getLogger().severe(e.getCause().toString());
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        try {
+            ByteBuf buf = (ByteBuf) msg;
 
-        e.getChannel().close();
+            while (buf.isReadable()) {
+                workerPool.processPacket(buf.readByte(), buf, ctx.channel());
+            }
+        } finally {
+            ReferenceCountUtil.release(msg);
+        }
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        ChannelBuffer buf = (ChannelBuffer) e.getMessage();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
+    }
 
-        while(buf.readable()) {
-            workerPool.processPacket(buf.readByte(), buf, e.getChannel());
+    public void closeServer() {
+        NuclearMC.getLogger().info("Server closing down");
+
+        try {
+            NuclearMC.getLogger().info("Closing Netty");
+
+            f.channel().closeFuture().sync();
+
+            workerGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
+        } catch (InterruptedException e) {
+            NuclearMC.getLogger().info("Problem closing Netty");
+            e.printStackTrace();
         }
+
     }
 }

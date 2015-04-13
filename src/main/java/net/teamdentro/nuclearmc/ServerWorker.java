@@ -1,15 +1,13 @@
 package net.teamdentro.nuclearmc;
 
-import java.net.Socket;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.packets.IPacket;
 import net.teamdentro.nuclearmc.packets.Packet;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
 
 public class ServerWorker implements Runnable {
 	private Thread workerThread;
-	private ChannelBuffer work;
+	private ByteBuf work;
     private Server server;
     private Channel client;
 
@@ -20,7 +18,7 @@ public class ServerWorker implements Runnable {
         workerThread = new Thread(this);
 	}
 	
-	public void process(byte id, ChannelBuffer packet, Channel client) {
+	public void process(byte id, ByteBuf packet, Channel client) {
         work = packet;
         this.client = client;
         this.id = id;
@@ -34,10 +32,11 @@ public class ServerWorker implements Runnable {
 	
 	@Override
 	public void run() {
+        NuclearMC.getLogger().info("Packet");
         try {
             Class<? extends IPacket> packetClass = Server.packetRegistry.get(id);
             if (packetClass == null) {
-                NuclearMC.getLogger().warning("Received invalid packet (0x" + Integer.toHexString(id) + ") from " + client.getRemoteAddress().toString());
+                NuclearMC.getLogger().warning("Received invalid packet (0x" + Integer.toHexString(id) + ") from " + client.remoteAddress().toString());
                 return;
             }
 
@@ -47,7 +46,7 @@ public class ServerWorker implements Runnable {
                 NuclearMC.getLogger().warning("## Superclass: " + packetClass.getSuperclass().toString());
             }
 
-            Packet p = ((Class<? extends Packet>)packetClass).getDeclaredConstructor(Server.class, Channel.class, ChannelBuffer.class).newInstance(server, client, work);
+            Packet p = ((Class<? extends Packet>)packetClass).getDeclaredConstructor(Server.class, Channel.class, ByteBuf.class).newInstance(server, client, work);
             p.handle();
         } catch (Exception e) {
             e.printStackTrace();

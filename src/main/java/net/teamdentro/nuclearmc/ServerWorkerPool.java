@@ -1,7 +1,7 @@
 package net.teamdentro.nuclearmc;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 
 public class ServerWorkerPool {
 	private ServerWorker[] workers;
@@ -16,7 +16,7 @@ public class ServerWorkerPool {
 		}
 	}
 	
-	public void processPacket(byte id, ChannelBuffer packet, Channel client) {
+	public void processPacket(byte id, ByteBuf packet, Channel client) {
 		for (ServerWorker worker : workers) {
 			if (!worker.isBusy()) {
 				worker.process(id, packet, client);

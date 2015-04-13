@@ -1,11 +1,7 @@
 package net.teamdentro.nuclearmc.packets;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
-import org.jboss.netty.buffer.ChannelBuffer;
-
-import java.io.IOException;
 
 /**
  * Created by Lignum on 12/04/2015.
@@ -66,12 +62,13 @@ public class SPacket08Teleport extends ServerPacket {
 
     @Override
     public void send() {
-        client.getChannel().write(getID());
-        client.getChannel().write((byte) -1);
-        client.getChannel().write((short) x);
-        client.getChannel().write((short) y);
-        client.getChannel().write((short) z);
-        client.getChannel().write((byte) yaw);
-        client.getChannel().write((byte) pitch);
+        write(getID());
+        write((byte) -1);
+        write((short) x);
+        write((short) y);
+        write((short) z);
+        write((byte) yaw);
+        write((byte) pitch);
+        flush();
     }
 }

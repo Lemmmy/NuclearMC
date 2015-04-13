@@ -1,10 +1,10 @@
 package net.teamdentro.nuclearmc.packets;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
 
 import java.io.IOException;
 
@@ -12,7 +12,7 @@ import java.io.IOException;
  * Created by Lignum on 12/04/2015.
  */
 public class Packet0DMessage extends Packet {
-    public Packet0DMessage(Server server, Channel client, ChannelBuffer data) {
+    public Packet0DMessage(Server server, Channel client, ByteBuf data) {
         super(server, client, data);
     }
 
