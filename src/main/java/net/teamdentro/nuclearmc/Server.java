@@ -38,7 +38,7 @@ public class Server implements Runnable {
     private int heartbeatInterval;
     private String serverName;
     private String motd;
-    private byte lastPlayerID = Byte.MIN_VALUE;
+    private byte lastPlayerID = (byte) 0;
     private Level level;
     private float heartbeatTimer;
     private String serverURL = "";
@@ -278,14 +278,11 @@ public class Server implements Runnable {
 
             packet.setRecipient(user);
             try {
-                System.out.print(user.getPlayerID());
                 packet.send();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-        System.out.println();
 
         packet.setRecipient(originalUser);
     }

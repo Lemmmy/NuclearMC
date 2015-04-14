@@ -18,7 +18,8 @@ public class Packet08Teleport extends Packet {
 
     @Override
     public void handle() {
-        data.readByte(); // player
+        byte player = data.readByte(); // player
+        if (player != (byte) 255) return;
         short posx = data.readShort();
         short posy = data.readShort();
         short posz = data.readShort();
