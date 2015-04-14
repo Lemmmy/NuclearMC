@@ -68,8 +68,9 @@ public class Packet0Connect extends Packet {
 
             SPacket07SpawnPlayer spawn = new SPacket07SpawnPlayer(server, user);
             spawn.setPos(spawnPos);
+            spawn.setPlayerID(user.getPlayerID());
             spawn.setName(user.getUsername());
-            server.broadcast(spawn, false);
+            server.broadcast(spawn, true);
 
             SPacket08Teleport teleport = new SPacket08Teleport(server, user);
             teleport.setPos(spawnPos);
