@@ -11,8 +11,8 @@ public enum Blocks {
     BEDROCK (7, "ADMINIUM"),
     WATER (8),
     STATIONARYWATER (9, "STILLWATER"), // this is no different to other water
-    LAVA (10, "MAGMA"),
-    STATIONARYLAVA (11, "STILLLAVA", "STILLMAGMA"), // this is no different to other lava
+    LAVA (10),
+    STATIONARYLAVA (11, "STILLLAVA"), // this is no different to other lava
     SAND (12),
     GRAVEL (13),
     GOLDORE (14),
