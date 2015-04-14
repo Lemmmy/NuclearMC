@@ -2,42 +2,16 @@ package net.teamdentro.nuclearmc.packets;
 
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import net.teamdentro.nuclearmc.util.Position;
 
 import java.io.IOException;
 
 public class SPacket07SpawnPlayer extends ServerPacket {
-    private short x;
-    private short y;
-    private short z;
     private String name;
     private byte playerID;
-    private int yaw, pitch;
+    private Position pos;
     public SPacket07SpawnPlayer(Server server, User client) {
         super(server, client);
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(short x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(short y) {
-        this.y = y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public void setZ(short z) {
-        this.z = z;
     }
 
     public String getName() {
@@ -56,20 +30,12 @@ public class SPacket07SpawnPlayer extends ServerPacket {
         this.playerID = playerID;
     }
 
-    public int getYaw() {
-        return yaw;
+    public Position getPos() {
+        return pos;
     }
 
-    public void setYaw(int yaw) {
-        this.yaw = yaw;
-    }
-
-    public int getPitch() {
-        return pitch;
-    }
-
-    public void setPitch(int pitch) {
-        this.pitch = pitch;
+    public void setPos(Position pos) {
+        this.pos = pos;
     }
 
     @Override
@@ -82,11 +48,11 @@ public class SPacket07SpawnPlayer extends ServerPacket {
         getWriter().writeByte(getID());
         getWriter().writeByte(playerID);
         writeString(name);
-        getWriter().writeShort(x);
-        getWriter().writeShort(y);
-        getWriter().writeShort(z);
-        getWriter().writeByte((byte) yaw);
-        getWriter().writeByte((byte) pitch);
+        getWriter().writeShort(pos.getX());
+        getWriter().writeShort(pos.getY());
+        getWriter().writeShort(pos.getZ());
+        getWriter().writeByte(pos.getYaw());
+        getWriter().writeByte(pos.getPitch());
         flush();
     }
 }

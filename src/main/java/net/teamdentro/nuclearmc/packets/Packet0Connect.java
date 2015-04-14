@@ -61,20 +61,18 @@ public class Packet0Connect extends Packet {
 
             server.getLevel().sendToUser(server, user);
 
+            Position spawnPos = new Position((short) (server.getLevel().getSpawnX() * 32),
+                    (short) (server.getLevel().getSpawnY() * 32 + 51),
+                    (short) (server.getLevel().getSpawnZ() * 32),
+                        (byte)0, (byte)0);
+
             SPacket07SpawnPlayer spawn = new SPacket07SpawnPlayer(server, user);
-            spawn.setX((short) (server.getLevel().getSpawnX() * 32));
-            spawn.setY((short) (server.getLevel().getSpawnY() * 32 + 51));
-            spawn.setZ((short) (server.getLevel().getSpawnZ() * 32));
-            spawn.setPlayerID(user.getPlayerID());
-            spawn.setPitch(0);
-            spawn.setYaw(0);
+            spawn.setPos(spawnPos);
             spawn.setName(user.getUsername());
             server.broadcast(spawn, false);
 
             SPacket08Teleport teleport = new SPacket08Teleport(server, user);
-            teleport.setPos(new Position((short) (server.getLevel().getSpawnX() * 32),
-                    (short) (server.getLevel().getSpawnY() * 32 + 51),
-                    (short) (server.getLevel().getSpawnZ() * 32)));
+            teleport.setPos(spawnPos);
             teleport.send();
 
             user.sendMessage("Welcome to the server!");

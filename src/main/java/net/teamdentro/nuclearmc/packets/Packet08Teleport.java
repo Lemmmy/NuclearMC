@@ -31,6 +31,7 @@ public class Packet08Teleport extends Packet {
 
         SPacket08Teleport packet = new SPacket08Teleport(server, getUser());
         packet.setPos(pos);
+        packet.setPlayer(getUser().getPlayerID());
         server.broadcast(packet, false);
     }
 }
