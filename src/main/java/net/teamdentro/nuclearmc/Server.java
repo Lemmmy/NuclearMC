@@ -29,7 +29,6 @@ public class Server implements Runnable {
     }
 
     private ServerConfig config;
-    private ServerWorkerPool workerPool;
     private String salt;
     private boolean running;
     private ChannelFuture f;
@@ -48,8 +47,6 @@ public class Server implements Runnable {
         config = new ServerConfig();
 
         setupLogFiles();
-
-        workerPool = new ServerWorkerPool(this, config.getInt("MaxWorkers", 1));
 
         heartbeatInterval = (int) (heartbeatTimer = config.getInt("HeartbeatInterval", 45));
         serverName = config.getValue("Name", "My NuclearMC Server");
@@ -94,10 +91,6 @@ public class Server implements Runnable {
 
     public boolean isRunning() {
         return running;
-    }
-
-    public ServerWorkerPool getWorkerPool() {
-        return workerPool;
     }
 
     public void heartbeat(final HeartbeatCallback callback) {
@@ -227,7 +220,8 @@ public class Server implements Runnable {
     }
 
     public byte makeUniquePlayerID() {
-        return ++lastPlayerID;
+        lastPlayerID++;
+        return (byte)(lastPlayerID-1);
     }
 
     public Level getLevel() {
@@ -279,16 +273,19 @@ public class Server implements Runnable {
         User originalUser = packet.getRecipient();
 
         for (User user : users) {
-            if (!includeOriginal && user.equals(originalUser))
+            if (!includeOriginal && user.getPlayerID() == originalUser.getPlayerID()) // temporary
                 continue;
 
             packet.setRecipient(user);
             try {
+                System.out.print(user.getPlayerID());
                 packet.send();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
+        System.out.println();
 
         packet.setRecipient(originalUser);
     }

@@ -37,8 +37,8 @@ public class SPacket0DChatMessage extends ServerPacket {
     @Override
     public void send() throws IOException {
         getWriter().writeByte(getID());
-        getWriter().writeByte(playerID);
-        writeString(message);
+        getWriter().writeByte(getPlayerID());
+        writeString(getMessage());
 
         flush();
     }

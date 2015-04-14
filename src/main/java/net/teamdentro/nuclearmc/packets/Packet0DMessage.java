@@ -51,7 +51,6 @@ public class Packet0DMessage extends Packet {
                 NuclearMC.getLogger().info("<" + user.getUsername() + "> " + message);
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

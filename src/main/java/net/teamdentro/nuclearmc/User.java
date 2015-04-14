@@ -1,9 +1,11 @@
 package net.teamdentro.nuclearmc;
 
 import io.netty.channel.Channel;
+import net.teamdentro.nuclearmc.packets.SPacket08Teleport;
 import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
 import net.teamdentro.nuclearmc.util.Position;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class User {
@@ -57,7 +59,6 @@ public class User {
         try {
             msg.send();
         } catch (java.io.IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -65,8 +66,23 @@ public class User {
         return pos;
     }
 
-    public void setPos(Position pos) {
+    public void setPos(Position pos, boolean teleport) {
         this.pos = pos;
+
+        SPacket08Teleport packet = new SPacket08Teleport(Server.instance, this);
+        packet.setPos(pos);
+        packet.setPlayer(getPlayerID());
+        Server.instance.broadcast(packet, false);
+
+        if (teleport) {
+            packet = new SPacket08Teleport(Server.instance, this);
+            packet.setPos(pos);
+            packet.setPlayer((byte) -1);
+            try {
+                packet.send();
+            } catch (IOException e) {
+            }
+        }
     }
 
     @Override

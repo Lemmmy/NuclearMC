@@ -27,11 +27,6 @@ public class Packet08Teleport extends Packet {
 
         Position pos = new Position(posx, posy, posz, yaw, pitch);
 
-        getUser().setPos(pos);
-
-        SPacket08Teleport packet = new SPacket08Teleport(server, getUser());
-        packet.setPos(pos);
-        packet.setPlayer(getUser().getPlayerID());
-        server.broadcast(packet, false);
+        getUser().setPos(pos, false);
     }
 }
