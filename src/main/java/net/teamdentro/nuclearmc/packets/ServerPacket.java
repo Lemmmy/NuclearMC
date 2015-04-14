@@ -2,6 +2,7 @@ package net.teamdentro.nuclearmc.packets;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
+import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 

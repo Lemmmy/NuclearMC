@@ -66,18 +66,28 @@ public class Packet0Connect extends Packet {
                     (short) (server.getLevel().getSpawnZ() * 32),
                         (byte)0, (byte)0);
 
+            // note for future: you only send this packet to the people in the same world.
+            // modify the broadcast function, perhaps a broadcastWorld one
             SPacket07SpawnPlayer spawn = new SPacket07SpawnPlayer(server, user);
             spawn.setPos(spawnPos);
             spawn.setPlayerID(user.getPlayerID());
             spawn.setName(user.getUsername());
-            server.broadcast(spawn, true);
+            server.broadcast(spawn, false);
 
             SPacket08Teleport teleport = new SPacket08Teleport(server, user);
             teleport.setPos(spawnPos);
             teleport.setPlayer((byte) -1);
             teleport.send();
 
-            user.sendMessage("Welcome to the server!");
+            // note for future: you only send these packets to the people in the same world.
+            for (User u : server.getOnlineUsers()) {
+                if (u.getPlayerID() == user.getPlayerID()) continue;
+                SPacket07SpawnPlayer s = new SPacket07SpawnPlayer(server, user);
+                s.setPos(u.getPos());
+                s.setPlayerID(u.getPlayerID());
+                s.setName(u.getUsername());
+                s.send();
+            }
         } catch (IOException ignored) {
         }
     }
