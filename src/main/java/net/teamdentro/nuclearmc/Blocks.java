@@ -52,7 +52,6 @@ public enum Blocks {
     MOSSYCOBBLESTONE (48, "MOSSSTONE", "MOSSCOBBLESTONE", "MOSS", "MOSSY", "MOSSYSTONE"),
     OBSIDIAN (49);
 
-
     private byte id;
     private String[] aliases;
 

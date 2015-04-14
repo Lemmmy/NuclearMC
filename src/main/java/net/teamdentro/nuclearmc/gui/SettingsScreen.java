@@ -8,6 +8,8 @@ import org.luaj.vm2.LuaValue;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +67,7 @@ public class SettingsScreen extends JFrame {
         GridLayout gridLayout = new GridLayout(0, 2, 8, 8);
         JPanel mainPanel = new JPanel(gridLayout);
         JScrollPane scrollPane = new JScrollPane(mainPanel);
+        mainPanel.setBorder(new EmptyBorder(3, 3, 3, 3));
 
         settings = new ArrayList<>();
 
@@ -73,7 +76,9 @@ public class SettingsScreen extends JFrame {
             settings.add(setting);
 
             JPanel settingPanel = new JPanel(new BorderLayout());
-            settingPanel.add(new JLabel(Util.splitPascalCase(key.tojstring())));
+            settingPanel.add(new JLabel(Util.splitPascalCase(key.tojstring())), BorderLayout.PAGE_START);
+
+            settingPanel.add(setting.getComponent(), BorderLayout.PAGE_END);
 
             mainPanel.add(settingPanel);
         }
@@ -93,7 +98,6 @@ public class SettingsScreen extends JFrame {
         private String key;
 
         private SettingType type;
-        private JComponent component;
 
         public Setting(LuaTable table, String key) {
             ownerTable = table;
@@ -135,7 +139,32 @@ public class SettingsScreen extends JFrame {
         }
 
         public JComponent getComponent() {
-            return null;
+            switch (type) {
+                case BOOLEAN:
+                    JCheckBox checkBox = new JCheckBox();
+                    checkBox.setSelected(value instanceof Boolean ? (boolean) value : false);
+                    return checkBox;
+                case INT:
+                    JSpinner spinner = new JSpinner();
+                    spinner.setModel(new SpinnerNumberModel(
+                            value instanceof Integer ? (int) value : 0,
+                            Integer.MIN_VALUE,
+                            Integer.MAX_VALUE,
+                            1));
+                    return spinner;
+                case DOUBLE:
+                    JSpinner dspinner = new JSpinner();
+                    dspinner.setModel(new SpinnerNumberModel(
+                            value instanceof Double ? (int) value : 0,
+                            Integer.MIN_VALUE,
+                            Integer.MAX_VALUE,
+                            1));
+                    return dspinner;
+                case STRING:
+                    JTextField textField = new JTextField(String.valueOf(value));
+                    return textField;
+            }
+            return new JLabel (value.toString());
         }
     }
 }
