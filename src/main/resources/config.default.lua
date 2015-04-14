@@ -1,15 +1,15 @@
 return {
-    ServerPort = 25565,
-    ServerIP = "0.0.0.0",
+    {"ServerPort", 25565},
+    {"ServerIP", "0.0.0.0"},
 
-    MaxPlayers = 32,
-    Name = "My NuclearMC Server",
+    {"MaxPlayers", 32},
+    {"Name", "My NuclearMC Server"},
 
-    HeartbeatInterval = 45,
-    MaxWorkers = 1,
+    {"HeartbeatInterval", 45},
+    {"MaxWorkers", 1},
 
-    MakeFancyLogs = false,
+    {"MakeFancyLogs", false},
 
-    MOTD = "Welcome to my NuclearMC Server!",
-    Public = false,
+    {"MOTD", "Welcome to my NuclearMC Server!"},
+    {"Public", false},
 }

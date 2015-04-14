@@ -1,5 +1,6 @@
 package net.teamdentro.nuclearmc.gui;
 
+import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.util.Util;
 import org.luaj.vm2.LuaDouble;
@@ -71,12 +72,14 @@ public class SettingsScreen extends JFrame {
 
         settings = new ArrayList<>();
 
-        for (LuaValue key : table.keys()) {
-            Setting setting = new Setting(table, key.tojstring());
+        for (int i = 1; i < table.length() + 1; i++) {
+            LuaTable t = table.get(i).checktable();
+
+            Setting setting = new Setting(table, t);
             settings.add(setting);
 
             JPanel settingPanel = new JPanel(new BorderLayout());
-            settingPanel.add(new JLabel(Util.splitPascalCase(key.tojstring())), BorderLayout.PAGE_START);
+            settingPanel.add(new JLabel(Util.splitPascalCase(t.get(1).tojstring())), BorderLayout.PAGE_START);
 
             settingPanel.add(setting.getComponent(), BorderLayout.PAGE_END);
 
@@ -99,10 +102,10 @@ public class SettingsScreen extends JFrame {
 
         private SettingType type;
 
-        public Setting(LuaTable table, String key) {
+        public Setting(LuaTable table, LuaTable key) {
             ownerTable = table;
-            this.key = key;
-            track = table.get(key);
+            this.key = key.get(1).tojstring();
+            track = key.get(2);
 
             switch (track.type()) {
                 case LuaValue.TBOOLEAN:

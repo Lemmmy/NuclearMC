@@ -36,15 +36,33 @@ public class ServerConfig {
     }
 
     public String getValue(String key, String def) {
-        return config.get(key) != null ? config.get(key).tojstring() : def;
+        for (int i = 1; i < config.length() + 1; i++) {
+            LuaTable t = config.get(i).checktable();
+            if (!t.get(1).tojstring().equalsIgnoreCase(key)) continue;
+
+            return t.get(2) != null ? t.get(2).tojstring() : def;
+        }
+        return def;
     }
 
     public int getInt(String key, int def) {
-        return config.get(key) != null && config.get(key).isint() ? config.get(key).toint() : def;
+        for (int i = 1; i < config.length() + 1; i++) {
+            LuaTable t = config.get(i).checktable();
+            if (!t.get(1).tojstring().equalsIgnoreCase(key)) continue;
+
+            return t.get(2) != null && t.get(2).isint() ? t.get(2).toint() : def;
+        }
+        return def;
     }
 
     public boolean getBoolean(String key, boolean def) {
-        return config.get(key) != null && config.get(key).isboolean() ? config.get(key).toboolean() : def;
+        for (int i = 1; i < config.length() + 1; i++) {
+            LuaTable t = config.get(i).checktable();
+            if (!t.get(1).tojstring().equalsIgnoreCase(key)) continue;
+
+            return t.get(2) != null && t.get(2).isboolean() ? t.get(2).isboolean() : def;
+        }
+        return def;
     }
 
     public LuaTable getConfig() {

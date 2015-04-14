@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import net.teamdentro.nuclearmc.util.Position;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -68,7 +69,13 @@ public class Packet0Connect extends Packet {
             spawn.setPitch(0);
             spawn.setYaw(0);
             spawn.setName(user.getUsername());
-            spawn.send();
+            server.broadcast(spawn, false);
+
+            SPacket08Teleport teleport = new SPacket08Teleport(server, user);
+            teleport.setPos(new Position((short) (server.getLevel().getSpawnX() * 32),
+                    (short) (server.getLevel().getSpawnY() * 32 + 51),
+                    (short) (server.getLevel().getSpawnZ() * 32)));
+            teleport.send();
 
             user.sendMessage("Welcome to the server!");
         } catch (IOException e) {
