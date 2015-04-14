@@ -1,4 +1,6 @@
-package net.teamdentro.nuclearmc;
+package net.teamdentro.nuclearmc.gui;
+
+import net.teamdentro.nuclearmc.NuclearMC;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -247,7 +249,7 @@ public class GUI extends JFrame {
         usersListPopupMenu.add(menuItem);
     }
 
-    protected JTextArea getTextArea() {
+    public JTextArea getTextArea() {
         return consoleTextArea;
     }
 }

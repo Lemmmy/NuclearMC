@@ -6,7 +6,9 @@ import net.teamdentro.nuclearmc.User;
 import java.io.IOException;
 
 public class SPacket07SpawnPlayer extends ServerPacket {
-    private int x, y, z;
+    private short x;
+    private short y;
+    private short z;
     private String name;
     private byte playerID;
     private int yaw, pitch;
@@ -18,7 +20,7 @@ public class SPacket07SpawnPlayer extends ServerPacket {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(short x) {
         this.x = x;
     }
 
@@ -26,7 +28,7 @@ public class SPacket07SpawnPlayer extends ServerPacket {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(short y) {
         this.y = y;
     }
 
@@ -34,7 +36,7 @@ public class SPacket07SpawnPlayer extends ServerPacket {
         return z;
     }
 
-    public void setZ(int z) {
+    public void setZ(short z) {
         this.z = z;
     }
 
@@ -80,9 +82,9 @@ public class SPacket07SpawnPlayer extends ServerPacket {
         getWriter().writeByte(getID());
         getWriter().writeByte(playerID);
         writeString(name);
-        getWriter().writeShort((short) x);
-        getWriter().writeShort((short) y);
-        getWriter().writeShort((short) z);
+        getWriter().writeShort(x);
+        getWriter().writeShort(y);
+        getWriter().writeShort(z);
         getWriter().writeByte((byte) yaw);
         getWriter().writeByte((byte) pitch);
         flush();

@@ -270,10 +270,18 @@ public class Server implements Runnable {
         }
     }
 
-    public void broadcast(ServerPacket packet) {
+    /**
+     * Broadcast a packet to all users on the server
+     * @param packet The packet to send
+     * @param includeOriginal Should the packet be sent to the original recipient?
+     */
+    public void broadcast(ServerPacket packet, boolean includeOriginal) {
         User originalUser = packet.getRecipient();
 
         for (User user : users) {
+            if (!includeOriginal && user.equals(originalUser))
+                continue;
+
             packet.setRecipient(user);
             try {
                 packet.send();
@@ -285,6 +293,10 @@ public class Server implements Runnable {
         packet.setRecipient(originalUser);
     }
 
+    /**
+     * Broadcast a chat message to all users on the server
+     * @param msg The chat message to send
+     */
     public void broadcastMessage(String msg) {
         for (User user : users) {
             user.sendMessage(msg);

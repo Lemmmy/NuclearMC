@@ -1,4 +1,6 @@
-package net.teamdentro.nuclearmc;
+package net.teamdentro.nuclearmc.gui;
+
+import net.teamdentro.nuclearmc.NuclearMC;
 
 import javax.swing.*;
 import java.text.SimpleDateFormat;

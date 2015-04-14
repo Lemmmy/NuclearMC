@@ -2,6 +2,7 @@ package net.teamdentro.nuclearmc;
 
 import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
+import net.teamdentro.nuclearmc.util.Position;
 
 import java.net.InetSocketAddress;
 
@@ -11,6 +12,7 @@ public class User {
     private String username;
     private Channel socket;
     private byte playerID;
+    private Position pos;
 
     public User(String username, InetSocketAddress sender, int port, Channel socket) {
         this.sender = sender;
@@ -57,6 +59,14 @@ public class User {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Position getPos() {
+        return pos;
+    }
+
+    public void setPos(Position pos) {
+        this.pos = pos;
     }
 
     @Override

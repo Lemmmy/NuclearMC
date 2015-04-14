@@ -1,5 +1,6 @@
-package net.teamdentro.nuclearmc;
+package net.teamdentro.nuclearmc.gui;
 
+import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.util.Util;
 import org.luaj.vm2.LuaDouble;
 import org.luaj.vm2.LuaTable;

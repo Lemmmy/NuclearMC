@@ -1,5 +1,8 @@
 package net.teamdentro.nuclearmc;
 
+import net.teamdentro.nuclearmc.gui.GUI;
+import net.teamdentro.nuclearmc.gui.GUILogHandler;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.ConsoleHandler;

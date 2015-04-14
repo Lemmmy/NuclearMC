@@ -61,9 +61,9 @@ public class Packet0Connect extends Packet {
             server.getLevel().sendToUser(server, user);
 
             SPacket07SpawnPlayer spawn = new SPacket07SpawnPlayer(server, user);
-            spawn.setX(server.getLevel().getSpawnX() * 32);
-            spawn.setY(server.getLevel().getSpawnY() * 32 + 51);
-            spawn.setZ(server.getLevel().getSpawnZ() * 32);
+            spawn.setX((short) (server.getLevel().getSpawnX() * 32));
+            spawn.setY((short) (server.getLevel().getSpawnY() * 32 + 51));
+            spawn.setZ((short) (server.getLevel().getSpawnZ() * 32));
             spawn.setPlayerID(user.getPlayerID());
             spawn.setPitch(0);
             spawn.setYaw(0);
