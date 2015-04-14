@@ -59,4 +59,12 @@ public enum Blocks {
         this.id = (byte)id;
         this.aliases = aliases;
     }
+
+    public byte getId() {
+        return id;
+    }
+
+    public String[] getAliases() {
+        return aliases;
+    }
 }

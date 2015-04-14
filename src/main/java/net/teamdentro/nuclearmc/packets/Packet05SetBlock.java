@@ -2,6 +2,7 @@ package net.teamdentro.nuclearmc.packets;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import net.teamdentro.nuclearmc.Blocks;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.util.Position;
 
@@ -12,19 +13,20 @@ public class Packet05SetBlock extends Packet {
 
     @Override
     public byte getID() {
-        return 0x08;
+        return 0x05;
     }
 
     @Override
     public void handle() {
-        byte player = data.readByte(); // player
-        if (player != (byte) 255) return;
         short posx = data.readShort();
         short posy = data.readShort();
         short posz = data.readShort();
         byte mode = data.readByte();
         byte block = data.readByte();
 
-
+        if (mode == (byte) 0x00)
+            getUser().getCurrentLevel().setBlockLOUDLY(posx, posy, posz, Blocks.AIR);
+        else
+            getUser().getCurrentLevel().setBlockLOUDLY(posx, posy, posz, Blocks.values()[block]);
     }
 }

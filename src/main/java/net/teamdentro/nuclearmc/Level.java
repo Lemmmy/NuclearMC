@@ -3,10 +3,12 @@ package net.teamdentro.nuclearmc;
 import net.teamdentro.nuclearmc.packets.SPacket02LevelInitialise;
 import net.teamdentro.nuclearmc.packets.SPacket03LevelData;
 import net.teamdentro.nuclearmc.packets.SPacket04LevelFinalise;
+import net.teamdentro.nuclearmc.packets.SPacket06SetBlock;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.zip.GZIPOutputStream;
 
@@ -26,12 +28,13 @@ public class Level {
         generateFlatland();
     }
 
-    public int getBlock(int x, int y, int z) {
-        return x >= 0 && y >= 0 && z >= 0 && x < width && y < depth && z < height ? blocks[getIndex(x, y, z)] : 0;
+    public Blocks getBlock(int x, int y, int z) {
+        return x >= 0 && y >= 0 && z >= 0 && x < width && y < depth && z < height ?
+                Blocks.values()[blocks[getIndex(x, y, z)]] : Blocks.AIR;
     }
 
-    public void setBlock(int x, int y, int z, int id) {
-        blocks[getIndex(x, y, z)] = (byte) id;
+    public void setBlock(int x, int y, int z, Blocks id) {
+        blocks[getIndex(x, y, z)] = (byte) id.getId();
     }
 
     public int getIndex(int x, int y, int z) {
@@ -42,7 +45,7 @@ public class Level {
         for (int y = 0; y < 8; ++y) {
             for (int z = 0; z < depth; ++z) {
                 for (int x = 0; x < width; ++x) {
-                    setBlock(x, y, z, rand.nextInt(49));
+                    setBlock(x, y, z, Blocks.values()[rand.nextInt(Blocks.values().length - 1)]);
                 }
             }
         }
@@ -50,6 +53,18 @@ public class Level {
         spawnX = 8;
         spawnY = 10;
         spawnZ = 8;
+    }
+
+    public void setBlockLOUDLY(int x, int y, int z, Blocks block) {
+        setBlock(x, y, z, block);
+
+        SPacket06SetBlock packet = new SPacket06SetBlock(Server.instance, null);
+        packet.setX((short) x);
+        packet.setY((short) y);
+        packet.setZ((short) z);
+        packet.setBlock(block.getId());
+
+        Server.instance.broadcast(packet, true);
     }
 
     public int getSpawnX() {
@@ -131,5 +146,17 @@ public class Level {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<User> getUsers() {
+        ArrayList<User> users = new ArrayList<>();
+
+        for (User user : Server.instance.getOnlineUsers()) {
+            if (user.getCurrentLevel().equals(this)) {
+                users.add(user);
+            }
+        }
+
+        return users;
     }
 }

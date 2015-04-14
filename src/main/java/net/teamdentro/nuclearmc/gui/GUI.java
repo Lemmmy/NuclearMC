@@ -227,8 +227,6 @@ public class GUI extends JFrame {
 
     private void shutDown() {
         NuclearMC.shutDown();
-        dispose();
-        System.exit(0);
     }
 
     /**

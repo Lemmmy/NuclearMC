@@ -57,6 +57,8 @@ public class NuclearMC {
     }
 
     public static void shutDown() {
-        // server.shutDown();
+        Server.instance.closeServer();
+        if (gui != null) gui.dispose();
+        System.exit(0);
     }
 }

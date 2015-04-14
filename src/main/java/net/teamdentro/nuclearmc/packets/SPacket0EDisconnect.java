@@ -33,6 +33,8 @@ public class SPacket0EDisconnect extends ServerPacket {
 
         NuclearMC.getLogger().info("Disconnected " + client.getUsername() + " [" + client.getAddress().toString() + ":" + client.getPort() + "] for reason \"" + reason + "\"");
 
+        client.disconnect();
+
         flush();
     }
 }

@@ -38,7 +38,7 @@ public class SettingsScreen extends JFrame {
 
     private void frame() {
         setTitle(TITLE);
-        setSize(800, 600);
+        setMaximumSize(new Dimension(800, 600));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
 
@@ -69,6 +69,7 @@ public class SettingsScreen extends JFrame {
         JPanel mainPanel = new JPanel(gridLayout);
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         mainPanel.setBorder(new EmptyBorder(3, 3, 3, 3));
+        scrollPane.setMaximumSize(new Dimension(800, 600));
 
         settings = new ArrayList<>();
 

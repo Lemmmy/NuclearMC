@@ -51,6 +51,7 @@ public class Packet0Connect extends Packet {
 
             User user = new User(username, (InetSocketAddress) client.remoteAddress(), ((InetSocketAddress) client.remoteAddress()).getPort(), client);
             user.setPlayerID(server.makeUniquePlayerID());
+            user.setCurrentLevel(server.getMainLevel());
             server.addUser(user);
 
             NuclearMC.getLogger().info("Player " + username + " [" + user.getAddress().toString() + ":" + user.getPort() + "] (EID " + user.getPlayerID() + ")");
@@ -59,11 +60,11 @@ public class Packet0Connect extends Packet {
             identify.setOp(true);
             identify.send();
 
-            server.getLevel().sendToUser(server, user);
+            user.getCurrentLevel().sendToUser(server, user);
 
-            Position spawnPos = new Position((short) (server.getLevel().getSpawnX() * 32),
-                    (short) (server.getLevel().getSpawnY() * 32 + 51),
-                    (short) (server.getLevel().getSpawnZ() * 32),
+            Position spawnPos = new Position((short) (user.getCurrentLevel().getSpawnX() * 32),
+                    (short) (user.getCurrentLevel().getSpawnY() * 32 + 51),
+                    (short) (user.getCurrentLevel().getSpawnZ() * 32),
                         (byte)0, (byte)0);
 
             // note for future: you only send this packet to the people in the same world.

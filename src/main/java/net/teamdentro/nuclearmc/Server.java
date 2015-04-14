@@ -40,9 +40,10 @@ public class Server implements Runnable {
     private String serverName;
     private String motd;
     private byte lastPlayerID = (byte) 0;
-    private Level level;
+    private Map<String, Level> loadedLevels;
     private float heartbeatTimer;
     private String serverURL = "";
+
     public Server() {
         running = false;
         config = new ServerConfig();
@@ -53,7 +54,10 @@ public class Server implements Runnable {
         serverName = config.getValue("Name", "My NuclearMC Server");
         motd = config.getValue("MOTD", "Welcome to my NuclearMC Server!");
 
-        level = new Level();
+        loadedLevels = new HashMap<>();
+        // if (!loadedLevels.containsKey(config.getValue("MainWorld")))
+        // create it and load it, else load it
+        loadedLevels.put(config.getValue("MainWorld", "main"), new Level());
     }
 
     public static void registerPacket(Class<? extends Packet> packet) {
@@ -67,6 +71,10 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * @deprecated The IDs conflict so this function is never used
+     */
+    @Deprecated
     public static void registerServerPacket(Class<? extends ServerPacket> packet) {
         ServerPacket p;
         try {
@@ -225,12 +233,19 @@ public class Server implements Runnable {
         return (byte)(lastPlayerID-1);
     }
 
-    public Level getLevel() {
-        return level;
+    public HashMap<String, Level> getLoadedLevels() {
+        if (loadedLevels instanceof HashMap)
+            return (HashMap<String, Level>) loadedLevels;
+        else
+            return null;
     }
 
-    public void setLevel(Level level) {
-        this.level = level;
+    public Level getLoadedLevel(String levelName) {
+        return loadedLevels.get(levelName);
+    }
+
+    public Level getMainLevel() {
+        return loadedLevels.get(config.getValue("MainWorld", "main"));
     }
 
     public String getServerName() {
@@ -255,14 +270,6 @@ public class Server implements Runnable {
                 }
             });
         }
-
-        for (int i = 0; i < users.size(); ++i) {
-            User user = users.get(i);
-            if (!user.getChannel().isOpen()) {
-                users.remove(i);
-                NuclearMC.getLogger().info(user.getUsername() + " has disconnected.");
-            }
-        }
     }
 
     /**
@@ -274,6 +281,30 @@ public class Server implements Runnable {
         User originalUser = packet.getRecipient();
 
         for (User user : users) {
+            if (!includeOriginal && user.getPlayerID() == originalUser.getPlayerID()) // temporary
+                continue;
+
+            packet.setRecipient(user);
+            try {
+                packet.send();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        packet.setRecipient(originalUser);
+    }
+
+    /**
+     * Broadcast a packet to all users on a level
+     * @param packet The packet to send
+     * @param includeOriginal Should the packet be sent to the original recipient?
+     * @param level The level to send it to
+     */
+    public void broadcast(ServerPacket packet, boolean includeOriginal, Level level) {
+        User originalUser = packet.getRecipient();
+
+        for (User user : level.getUsers()) {
             if (!includeOriginal && user.getPlayerID() == originalUser.getPlayerID()) // temporary
                 continue;
 
@@ -360,20 +391,16 @@ public class Server implements Runnable {
     public void closeServer() {
         NuclearMC.getLogger().info("Server closing down");
 
-        try {
-            NuclearMC.getLogger().info("Closing Netty");
-
-            f.channel().closeFuture().sync();
-
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
-        } catch (InterruptedException e) {
-            NuclearMC.getLogger().info("Problem closing Netty");
-            e.printStackTrace();
+        for (int i = 0; i < users.size(); i++) {
+            kickUser(users.get(i), config.getValue("ShutdownMessage", "Server is shutting down"));
         }
     }
 
     public ServerConfig getServerConfig() {
         return config;
+    }
+
+    public void disconnectUser(User user) {
+        users.remove(user);
     }
 }

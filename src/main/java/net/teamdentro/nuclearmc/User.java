@@ -2,6 +2,7 @@ package net.teamdentro.nuclearmc;
 
 import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.packets.SPacket08Teleport;
+import net.teamdentro.nuclearmc.packets.SPacket0CDespawnPlayer;
 import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
 import net.teamdentro.nuclearmc.util.Position;
 
@@ -15,6 +16,8 @@ public class User {
     private Channel socket;
     private byte playerID;
     private Position pos;
+
+    private Level currentLevel;
 
     public User(String username, InetSocketAddress sender, int port, Channel socket) {
         this.sender = sender;
@@ -93,5 +96,19 @@ public class User {
 
         User user = (User) obj;
         return user.getUsername().equals(username);
+    }
+
+    public Level getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public void setCurrentLevel(Level currentLevel) {
+        this.currentLevel = currentLevel;
+    }
+
+    public void disconnect() {
+        SPacket0CDespawnPlayer packet = new SPacket0CDespawnPlayer(Server.instance, this);
+        packet.setPlayerID(getPlayerID());
+        Server.instance.broadcast(packet, false, getCurrentLevel());
     }
 }
