@@ -25,6 +25,7 @@ public class Server implements Runnable {
     static {
         registerPacket(Packet0Connect.class);
         registerPacket(Packet0DMessage.class);
+        registerPacket(Packet05SetBlock.class);
         registerPacket(Packet08Teleport.class);
     }
 
