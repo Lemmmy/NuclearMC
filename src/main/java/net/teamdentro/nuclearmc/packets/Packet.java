@@ -42,6 +42,6 @@ public abstract class Packet implements IPacket {
         for (int i = 0; i < size; ++i) {
             b[i] = data.readByte();
         }
-        return new String(b);
+        return new String(b).trim();
     }
 }

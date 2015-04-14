@@ -74,6 +74,7 @@ public class Packet0Connect extends Packet {
 
             SPacket08Teleport teleport = new SPacket08Teleport(server, user);
             teleport.setPos(spawnPos);
+            teleport.setPlayer((byte)-1);
             teleport.send();
 
             user.sendMessage("Welcome to the server!");
