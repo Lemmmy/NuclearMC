@@ -44,9 +44,9 @@ public class Packet0DMessage extends Packet {
             message = readString();
 
             User user = getUser();
-            NuclearMC.getLogger().info(message);
 
             if (user != null) {
+                // temporary message sending: this will probably be handled by plugins
                 server.broadcastMessage("<" + user.getUsername() + "> " + message);
                 NuclearMC.getLogger().info("<" + user.getUsername() + "> " + message);
             }

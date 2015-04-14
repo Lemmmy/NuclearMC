@@ -2,8 +2,10 @@ package net.teamdentro.nuclearmc.packets;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import net.teamdentro.nuclearmc.util.Util;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -34,8 +36,10 @@ public abstract class Packet implements IPacket {
     public abstract void handle();
 
     protected String readString() throws IOException {
-        byte[] b = new byte[64];
-        for (int i = 0; i < 64; ++i) {
+        int size = Util.clamp(data.readableBytes(), 0, 64);
+
+        byte[] b = new byte[size];
+        for (int i = 0; i < size; ++i) {
             b[i] = data.readByte();
         }
         return new String(b);

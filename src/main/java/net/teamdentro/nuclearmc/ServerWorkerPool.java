@@ -9,7 +9,7 @@ public class ServerWorkerPool {
     public ServerWorkerPool(Server server, int workers) {
         this.workers = new ServerWorker[workers];
 
-        NuclearMC.getLogger().info("Initialising worker pool with " + workers + " worker(s).");
+        NuclearMC.getLogger().info("Initialising worker pool with " + workers + " worker(s)");
 
         for (int i = 0; i < workers; ++i) {
             this.workers[i] = new ServerWorker(server);

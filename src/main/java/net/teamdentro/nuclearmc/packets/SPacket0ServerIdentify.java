@@ -28,7 +28,6 @@ public class SPacket0ServerIdentify extends ServerPacket {
 
     @Override
     public void send() throws IOException {
-        NuclearMC.getLogger().info("IDENTIFY");
         getWriter().writeByte(getID());
         getWriter().writeByte((byte) 0x07);
         writeString(server.getServerName());
