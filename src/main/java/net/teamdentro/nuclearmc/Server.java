@@ -56,8 +56,6 @@ public class Server implements Runnable {
         serverName = config.getValue("Name", "My NuclearMC Server");
         motd = config.getValue("MOTD", "Welcome to my NuclearMC Server!");
 
-        pluginManager.loadPlugin("default");
-
         loadedLevels = new HashMap<>();
         // if (!loadedLevels.containsKey(config.getValue("MainWorld")))
         // create it and load it, else load it
@@ -498,6 +496,8 @@ public class Server implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
+            pluginManager.loadPlugins("plugins");
+
             salt = generateSalt();
 
             long lastTime = System.currentTimeMillis();
@@ -528,6 +528,12 @@ public class Server implements Runnable {
      * while they're inside of it, do you?
      */
     public void closeServer() {
+        try {
+            pluginManager.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         NuclearMC.getLogger().info("Server closing down");
 
         for (int i = 0; i < users.size(); i++) {

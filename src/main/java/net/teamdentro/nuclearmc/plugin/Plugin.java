@@ -7,17 +7,14 @@ import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import org.luaj.vm2.luajc.LuaJC;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  * Created by Lignum on 15/04/2015.
  */
-public class Plugin {
-    private static Globals lua;
-    private static LuaTable nmcApi;
+public abstract class Plugin implements Closeable {
+    protected static Globals lua;
+    protected static LuaTable nmcApi;
 
     static {
         lua = JsePlatform.standardGlobals();
@@ -40,11 +37,13 @@ public class Plugin {
         return lua;
     }
 
-    protected static void runFile(String filename) {
-        lua.get("loadfile").call(LuaValue.valueOf(filename)).call();
+    public abstract LuaValue run(String filename, boolean ignoreFileExistence) throws IOException, LuaError;
+
+    protected static LuaValue runFile(String filename) throws LuaError {
+        return lua.get("loadfile").call(LuaValue.valueOf(filename)).call();
     }
 
-    protected static void runFromStream(InputStream stream) throws IOException {
+    protected static LuaValue runFromStream(InputStream stream) throws IOException, LuaError {
         String file = "";
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -54,6 +53,6 @@ public class Plugin {
             file += line;
         }
 
-        lua.get("load").call(LuaValue.valueOf(file)).call();
+        return lua.get("load").call(LuaValue.valueOf(file)).call();
     }
 }
