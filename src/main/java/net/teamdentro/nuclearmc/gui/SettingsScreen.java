@@ -9,6 +9,10 @@ import org.luaj.vm2.LuaValue;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -143,27 +147,65 @@ public class SettingsScreen extends JFrame {
         public JComponent getComponent() {
             switch (type) {
                 case BOOLEAN:
-                    JCheckBox checkBox = new JCheckBox();
-                    checkBox.setSelected(value instanceof Boolean ? (boolean) value : false);
+                    final JCheckBox checkBox = new JCheckBox();
+                    checkBox.setSelected(value instanceof Boolean && (boolean) value);
+                    checkBox.addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            value = checkBox.isSelected();
+                        }
+                    });
                     return checkBox;
                 case INT:
-                    JSpinner spinner = new JSpinner();
+                    final JSpinner spinner = new JSpinner();
                     spinner.setModel(new SpinnerNumberModel(
                             value instanceof Integer ? (int) value : 0,
                             Integer.MIN_VALUE,
                             Integer.MAX_VALUE,
                             1));
+                    spinner.addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            value = spinner.getValue();
+                        }
+                    });
                     return spinner;
                 case DOUBLE:
-                    JSpinner dspinner = new JSpinner();
+                    final JSpinner dspinner = new JSpinner();
                     dspinner.setModel(new SpinnerNumberModel(
                             value instanceof Double ? (int) value : 0,
                             Integer.MIN_VALUE,
                             Integer.MAX_VALUE,
                             1));
+                    dspinner.addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            value = dspinner.getValue();
+                        }
+                    });
                     return dspinner;
                 case STRING:
-                    JTextField textField = new JTextField(String.valueOf(value));
+                    final JTextField textField = new JTextField(String.valueOf(value));
+                    textField.getDocument().addDocumentListener(new DocumentListener() {
+                        @Override
+                        public void insertUpdate(DocumentEvent e) {
+                            setVal();
+                        }
+
+                        @Override
+                        public void removeUpdate(DocumentEvent e) {
+                            setVal();
+                        }
+
+                        @Override
+                        public void changedUpdate(DocumentEvent e) {
+                            setVal();
+                        }
+
+                        private void setVal() {
+                            value = textField.getText();
+                        }
+                    });
                     return textField;
             }
             return new JLabel(value.toString());

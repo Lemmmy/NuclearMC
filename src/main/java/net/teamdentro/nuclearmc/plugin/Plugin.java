@@ -1,11 +1,7 @@
 package net.teamdentro.nuclearmc.plugin;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import org.luaj.vm2.*;
-import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.jse.JsePlatform;
-import org.luaj.vm2.luajc.LuaJC;
 
 import java.io.*;
 
@@ -18,29 +14,21 @@ public abstract class Plugin implements Closeable {
 
     static {
         lua = JsePlatform.standardGlobals();
-        lua.set("print", new OneArgFunction() {
-            @Override
-            public LuaValue call(LuaValue arg) {
-                String msg = arg.checkjstring();
-                NuclearMC.getLogger().info(msg);
-                return null;
-            }
-        });
-
-        nmcApi = new LuaTable();
-        nmcApi.set("getConfig", new ConfigLib.GetConfigFunc());
-
-        lua.set("NMC", nmcApi);
+        PluginGlobals.set(lua);
     }
 
     public static Globals getGlobals() {
         return lua;
     }
 
+    public static void addGlobal(String key, LuaValue value) {
+        lua.set(key, value);
+    }
+
     public abstract LuaValue run(String filename, boolean ignoreFileExistence) throws IOException, LuaError;
 
     protected static LuaValue runFile(String filename) throws LuaError {
-        return lua.get("loadfile").call(LuaValue.valueOf(filename)).call();
+        return lua.loadfile(filename);
     }
 
     protected static LuaValue runFromStream(InputStream stream) throws IOException, LuaError {
@@ -53,6 +41,6 @@ public abstract class Plugin implements Closeable {
             file += line;
         }
 
-        return lua.get("load").call(LuaValue.valueOf(file)).call();
+        return lua.loadfile(file);
     }
 }

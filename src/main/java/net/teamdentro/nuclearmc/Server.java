@@ -302,6 +302,19 @@ public class Server implements Runnable {
     }
 
     /**
+     * Removes a player from the server
+     *
+     * @param player The player to kick, by name
+     */
+    public void disconnectPlayer(String player) {
+        for (User user : users) {
+            if (user.getUsername().equals(player)) {
+                users.remove(user);
+            }
+        }
+    }
+
+    /**
      * Gets a loaded level from its name
      *
      * @param levelName The level name
