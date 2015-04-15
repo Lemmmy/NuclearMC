@@ -1,5 +1,7 @@
 package net.teamdentro.nuclearmc;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,13 +41,19 @@ public class FancyFormatter extends Formatter {
         }
     }
 
+    private static String htmlify(String text) {
+        String newText = StringEscapeUtils.escapeHtml4(text);
+        newText = newText.replace('\u2713', 'O'); // replace check marks
+        return newText;
+    }
+
     @Override
     public String format(LogRecord rec) {
         String html = "<div>";
         html += formatDate(rec.getMillis());
         String tag = levelTagMap.get(rec.getLevel());
         html += "<" + tag + ">";
-        html += rec.getMessage();
+        html += htmlify(rec.getMessage());
         html += "</" + tag + ">";
         html += "</div>";
         return html;
