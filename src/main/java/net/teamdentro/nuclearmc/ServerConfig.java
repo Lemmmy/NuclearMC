@@ -17,6 +17,9 @@ public class ServerConfig {
         loadConfig();
     }
 
+    /**
+     * Load the configuration file, or create it if it doesn't exist.
+     */
     public void loadConfig() {
         config = null;
         configFile = new File("config.lua");
@@ -35,26 +38,13 @@ public class ServerConfig {
                 LuaValue.valueOf("./config.default.lua")).checktable();
     }
 
-    public String getValue(String key, String def) {
-        for (int i = 1; i < config.length() + 1; i++) {
-            LuaTable t = config.get(i).checktable();
-            if (!t.get(1).tojstring().equalsIgnoreCase(key)) continue;
-
-            return t.get(2) != null ? t.get(2).tojstring() : def;
-        }
-        return def;
-    }
-
-    public int getInt(String key, int def) {
-        for (int i = 1; i < config.length() + 1; i++) {
-            LuaTable t = config.get(i).checktable();
-            if (!t.get(1).tojstring().equalsIgnoreCase(key)) continue;
-
-            return t.get(2) != null && t.get(2).isint() ? t.get(2).toint() : def;
-        }
-        return def;
-    }
-
+    /**
+     * Gets a boolean from the configuration file
+     *
+     * @param key The key of the boolean
+     * @param def The default value if it is invalid or doesn't exist
+     * @return The value or default value
+     */
     public boolean getBoolean(String key, boolean def) {
         for (int i = 1; i < config.length() + 1; i++) {
             LuaTable t = config.get(i).checktable();
@@ -65,7 +55,46 @@ public class ServerConfig {
         return def;
     }
 
+    /**
+     * Gets the configuration file
+     *
+     * @return The configuration file
+     */
     public LuaTable getConfig() {
         return config;
+    }
+
+    /**
+     * Gets an integer from the configuration file
+     *
+     * @param key The key of the integer
+     * @param def The default value if it is invalid or doesn't exist
+     * @return The value or default value
+     */
+    public int getInt(String key, int def) {
+        for (int i = 1; i < config.length() + 1; i++) {
+            LuaTable t = config.get(i).checktable();
+            if (!t.get(1).tojstring().equalsIgnoreCase(key)) continue;
+
+            return t.get(2) != null && t.get(2).isint() ? t.get(2).toint() : def;
+        }
+        return def;
+    }
+
+    /**
+     * Gets a string from the configuration file
+     *
+     * @param key The key of the string
+     * @param def The default value if it is invalid or doesn't exist
+     * @return The value or default value
+     */
+    public String getValue(String key, String def) {
+        for (int i = 1; i < config.length() + 1; i++) {
+            LuaTable t = config.get(i).checktable();
+            if (!t.get(1).tojstring().equalsIgnoreCase(key)) continue;
+
+            return t.get(2) != null ? t.get(2).tojstring() : def;
+        }
+        return def;
     }
 }

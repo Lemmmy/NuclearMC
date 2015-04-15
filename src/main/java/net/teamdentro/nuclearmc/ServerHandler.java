@@ -11,7 +11,25 @@ import net.teamdentro.nuclearmc.packets.Packet;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 
+/**
+ * Handles the server like a child. Creepily, secretly and violently.
+ */
 public class ServerHandler extends ChannelInboundHandlerAdapter {
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelUnregistered(ctx);
+
+        for (User user : Server.instance.getOnlineUsers()) {
+            if (user.getAddress().equals(ctx.channel().remoteAddress()) && user.getPort() == ((InetSocketAddress) ctx.channel().remoteAddress()).getPort()) {
+                user.disconnect();
+
+                NuclearMC.getLogger().info("Player " + user.getUsername() + " was disconnected from the server");
+
+                Server.instance.disconnectUser(user);
+            }
+        }
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
@@ -48,20 +66,5 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         ctx.close();
-    }
-
-    @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        super.channelUnregistered(ctx);
-
-        for (User user : Server.instance.getOnlineUsers()) {
-            if (user.getAddress().equals(ctx.channel().remoteAddress()) && user.getPort() == ((InetSocketAddress) ctx.channel().remoteAddress()).getPort()) {
-                user.disconnect();
-
-                NuclearMC.getLogger().info("Player " + user.getUsername() + " was disconnected from the server");
-
-                Server.instance.disconnectUser(user);
-            }
-        }
     }
 }

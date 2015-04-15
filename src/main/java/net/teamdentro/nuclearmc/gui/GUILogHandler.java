@@ -39,14 +39,14 @@ public class GUILogHandler extends Handler {
 
     }
 
-    public void setTextArea(JTextArea textArea) {
-        this.textArea = textArea;
-    }
-
     private String formatDate(long ms) {
         SimpleDateFormat f = new SimpleDateFormat("MM/dd HH:mm");
         Date d = new Date(ms);
         return f.format(d);
+    }
+
+    public void setTextArea(JTextArea textArea) {
+        this.textArea = textArea;
     }
 
     //...

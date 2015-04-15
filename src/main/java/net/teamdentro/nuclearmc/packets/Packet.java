@@ -2,7 +2,6 @@ package net.teamdentro.nuclearmc.packets;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 import net.teamdentro.nuclearmc.util.Util;
@@ -21,6 +20,8 @@ public abstract class Packet implements IPacket {
         this.data = data;
     }
 
+    public abstract byte getID();
+
     public User getUser() {
         for (User user : server.getOnlineUsers()) {
             if (user.getAddress().equals(client.remoteAddress()) && user.getPort() == ((InetSocketAddress) client.remoteAddress()).getPort()) {
@@ -30,8 +31,6 @@ public abstract class Packet implements IPacket {
 
         return null;
     }
-
-    public abstract byte getID();
 
     public abstract void handle();
 

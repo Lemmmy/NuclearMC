@@ -3,7 +3,6 @@ package net.teamdentro.nuclearmc.packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.Server;
-import net.teamdentro.nuclearmc.User;
 import net.teamdentro.nuclearmc.util.Position;
 
 public class Packet08Teleport extends Packet {

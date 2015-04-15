@@ -1,6 +1,5 @@
 package net.teamdentro.nuclearmc.gui;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.util.Util;
 import org.luaj.vm2.LuaDouble;
@@ -9,7 +8,6 @@ import org.luaj.vm2.LuaValue;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.IOException;
@@ -52,9 +50,6 @@ public class SettingsScreen extends JFrame {
         setIconImage(icon);
     }
 
-    private void listeners() {
-    }
-
     private void components() {
         tabs = new JTabbedPane();
 
@@ -62,6 +57,9 @@ public class SettingsScreen extends JFrame {
 
         add(tabs);
         pack();
+    }
+
+    private void listeners() {
     }
 
     public void addSettingsScreen(String name, LuaTable table) {
@@ -168,7 +166,7 @@ public class SettingsScreen extends JFrame {
                     JTextField textField = new JTextField(String.valueOf(value));
                     return textField;
             }
-            return new JLabel (value.toString());
+            return new JLabel(value.toString());
         }
     }
 }

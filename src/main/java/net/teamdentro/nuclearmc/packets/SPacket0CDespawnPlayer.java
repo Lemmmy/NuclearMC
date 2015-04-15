@@ -6,11 +6,11 @@ import net.teamdentro.nuclearmc.User;
 import java.io.IOException;
 
 public class SPacket0CDespawnPlayer extends ServerPacket {
+    private byte playerid;
+
     public SPacket0CDespawnPlayer(Server server, User client) {
         super(server, client);
     }
-
-    private byte playerid;
 
     @Override
     public byte getID() {

@@ -21,22 +21,6 @@ public class Packet0DMessage extends Packet {
         return 0x0D;
     }
 
-    public byte getUserdata() {
-        return userdata;
-    }
-
-    public void setUserdata(byte userdata) {
-        this.userdata = userdata;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     @Override
     public void handle() {
         try {
@@ -52,5 +36,21 @@ public class Packet0DMessage extends Packet {
             }
         } catch (IOException e) {
         }
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public byte getUserdata() {
+        return userdata;
+    }
+
+    public void setUserdata(byte userdata) {
+        this.userdata = userdata;
     }
 }

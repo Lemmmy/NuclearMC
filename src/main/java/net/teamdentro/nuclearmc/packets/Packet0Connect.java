@@ -5,7 +5,6 @@ import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
-import net.teamdentro.nuclearmc.util.Position;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -18,22 +17,6 @@ public class Packet0Connect extends Packet {
 
     public Packet0Connect(Server server, Channel client, ByteBuf data) {
         super(server, client, data);
-    }
-
-    public byte getProtVersion() {
-        return protVersion;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public byte getUserdata() {
-        return userdata;
     }
 
     @Override
@@ -51,7 +34,7 @@ public class Packet0Connect extends Packet {
 
             User user = new User(username, (InetSocketAddress) client.remoteAddress(), ((InetSocketAddress) client.remoteAddress()).getPort(), client);
             user.setPlayerID(server.makeUniquePlayerID());
-            user.setCurrentLevel(server.getMainLevel());
+            user.setLevel(server.getMainLevel());
             server.addUser(user);
 
             NuclearMC.getLogger().info("Player " + username + " [" + user.getAddress().toString() + ":" + user.getPort() + "] (EID " + user.getPlayerID() + ")");
@@ -60,36 +43,24 @@ public class Packet0Connect extends Packet {
             identify.setOp(true);
             identify.send();
 
-            user.getCurrentLevel().sendToUser(server, user);
-
-            Position spawnPos = new Position((short) (user.getCurrentLevel().getSpawnX() * 32),
-                    (short) (user.getCurrentLevel().getSpawnY() * 32 + 51),
-                    (short) (user.getCurrentLevel().getSpawnZ() * 32),
-                        (byte)0, (byte)0);
-
-            // note for future: you only send this packet to the people in the same world.
-            // modify the broadcast function, perhaps a broadcastWorld one
-            SPacket07SpawnPlayer spawn = new SPacket07SpawnPlayer(server, user);
-            spawn.setPos(spawnPos);
-            spawn.setPlayerID(user.getPlayerID());
-            spawn.setName(user.getUsername());
-            server.broadcast(spawn, false);
-
-            SPacket08Teleport teleport = new SPacket08Teleport(server, user);
-            teleport.setPos(spawnPos);
-            teleport.setPlayer((byte) -1);
-            teleport.send();
-
-            // note for future: you only send these packets to the people in the same world.
-            for (User u : server.getOnlineUsers()) {
-                if (u.getPlayerID() == user.getPlayerID()) continue;
-                SPacket07SpawnPlayer s = new SPacket07SpawnPlayer(server, user);
-                s.setPos(u.getPos());
-                s.setPlayerID(u.getPlayerID());
-                s.setName(u.getUsername());
-                s.send();
-            }
+            user.setLevel(server.getMainLevel());
         } catch (IOException ignored) {
         }
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public byte getProtVersion() {
+        return protVersion;
+    }
+
+    public byte getUserdata() {
+        return userdata;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

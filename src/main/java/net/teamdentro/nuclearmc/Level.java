@@ -18,79 +18,155 @@ public class Level {
     private int spawnX, spawnY, spawnZ;
     private Random rand = new Random();
 
-    public Level() {
-        width = 128;
-        height = 64;
-        depth = 128;
+    /**
+     * Create a new level with the specified dimensions
+     *
+     * @param w The width of the level (x axis). Must be a power of two
+     * @param h The height of the level (y axis). Must be a power of two.
+     * @param d The depth of the level (z axis). Must be a power of two.
+     */
+    public Level(int w, int h, int d) {
+        width = w;
+        height = h;
+        depth = d;
 
         blocks = new byte[width * height * depth];
 
         generateFlatland();
     }
 
+    /**
+     * Generates a flat level, with the grass at sea level (height / 2) and the spawn point at the centre of the map
+     */
+    public void generateFlatland() {
+        for (int y = 0; y < height / 2; ++y) {
+            for (int z = 0; z < depth; ++z) {
+                for (int x = 0; x < width; ++x) {
+                    setBlock(x, y, z, y == height / 2 - 1 ? Blocks.GRASS : Blocks.DIRT);
+                }
+            }
+        }
+
+        spawnX = width / 2;
+        spawnY = height / 2 + 1;
+        spawnZ = depth / 2;
+    }
+
+    /**
+     * Sets a block at the specified coordinates
+     *
+     * @param x     The X position
+     * @param y     The Y position
+     * @param z     The Z position
+     * @param block The Blocks block to set at the specified coordinates
+     * @see #setBlockLOUDLY(int, int, int, Blocks)
+     */
+    public void setBlock(int x, int y, int z, Blocks block) {
+        blocks[getIndex(x, y, z)] = (byte) block.getId();
+    }
+
+    /**
+     * Gets the index of the specified coordinates
+     *
+     * @param x The X position
+     * @param y The Y position
+     * @param z The Z position
+     * @return The index of the specified coordinates
+     */
+    public int getIndex(int x, int y, int z) {
+        return (y * depth + z) * width + x;
+    }
+
+    /**
+     * Gets the block at the specified coordinates
+     *
+     * @param x The X position
+     * @param y The Y position
+     * @param z The Z position
+     * @return The Blocks block at the specified coordinates
+     */
     public Blocks getBlock(int x, int y, int z) {
         return x >= 0 && y >= 0 && z >= 0 && x < width && y < depth && z < height ?
                 Blocks.values()[blocks[getIndex(x, y, z)]] : Blocks.AIR;
     }
 
-    public void setBlock(int x, int y, int z, Blocks id) {
-        blocks[getIndex(x, y, z)] = (byte) id.getId();
-    }
-
-    public int getIndex(int x, int y, int z) {
-        return (y * depth + z) * width + x;
-    }
-
-    public void generateFlatland() {
-        for (int y = 0; y < 8; ++y) {
-            for (int z = 0; z < depth; ++z) {
-                for (int x = 0; x < width; ++x) {
-                    setBlock(x, y, z, Blocks.values()[rand.nextInt(Blocks.values().length - 1)]);
-                }
-            }
-        }
-
-        spawnX = 8;
-        spawnY = 10;
-        spawnZ = 8;
-    }
-
-    public void setBlockLOUDLY(int x, int y, int z, Blocks block) {
-        setBlock(x, y, z, block);
-
-        SPacket06SetBlock packet = new SPacket06SetBlock(Server.instance, null);
-        packet.setX((short) x);
-        packet.setY((short) y);
-        packet.setZ((short) z);
-        packet.setBlock(block.getId());
-
-        Server.instance.broadcast(packet, true);
-    }
-
+    /**
+     * Gets the X coordinate of the level's spawn point
+     *
+     * @return The X coordinate of the level's spawn point
+     */
     public int getSpawnX() {
         return spawnX;
     }
 
+    /**
+     * Sets the X coordinate of the level's spawn point
+     *
+     * @param spawnX The X coordinate of the level's spawn point
+     */
     public void setSpawnX(int spawnX) {
         this.spawnX = spawnX;
     }
 
+    /**
+     * Gets the Y coordinate of the level's spawn point
+     *
+     * @return The Y coordinate of the level's spawn point
+     */
     public int getSpawnY() {
         return spawnY;
     }
 
+    /**
+     * Sets the X coordinate of the level's spawn point
+     *
+     * @param spawnY The Y coordinate of the level's spawn point
+     */
     public void setSpawnY(int spawnY) {
         this.spawnY = spawnY;
     }
 
+    /**
+     * Gets the Z coordinate of the level's spawn point
+     *
+     * @return The Z coordinate of the level's spawn point
+     */
     public int getSpawnZ() {
         return spawnZ;
     }
 
+    /**
+     * Sets the Z coordinate of the level's spawn point
+     *
+     * @param spawnZ The Z coordinate of the level's spawn point
+     */
     public void setSpawnZ(int spawnZ) {
         this.spawnZ = spawnZ;
     }
 
+    /**
+     * Gets a list of users in this level
+     *
+     * @return A list of users in this level
+     */
+    public ArrayList<User> getUsers() {
+        ArrayList<User> users = new ArrayList<>();
+
+        for (User user : Server.instance.getOnlineUsers()) {
+            if (user.getLevel().equals(this)) {
+                users.add(user);
+            }
+        }
+
+        return users;
+    }
+
+    /**
+     * Sends the level to a user
+     *
+     * @param server The server instance
+     * @param user   The user to send the level to
+     */
     public void sendToUser(Server server, User user) {
         SPacket02LevelInitialise init = new SPacket02LevelInitialise(server, user);
         try {
@@ -148,15 +224,24 @@ public class Level {
         }
     }
 
-    public ArrayList<User> getUsers() {
-        ArrayList<User> users = new ArrayList<>();
+    /**
+     * LOUDLY SETS A BLOCK (sets a block and sends a packet to all users in the level)
+     *
+     * @param x     The X position
+     * @param y     The Y position
+     * @param z     The Z position
+     * @param block The Blocks block to set at the specified coordinates
+     * @see #setBlock(int, int, int, Blocks)
+     */
+    public void setBlockLOUDLY(int x, int y, int z, Blocks block) {
+        setBlock(x, y, z, block);
 
-        for (User user : Server.instance.getOnlineUsers()) {
-            if (user.getCurrentLevel().equals(this)) {
-                users.add(user);
-            }
-        }
+        SPacket06SetBlock packet = new SPacket06SetBlock(Server.instance, null);
+        packet.setX((short) x);
+        packet.setY((short) y);
+        packet.setZ((short) z);
+        packet.setBlock(block.getId());
 
-        return users;
+        Server.instance.broadcast(packet, true, this);
     }
 }

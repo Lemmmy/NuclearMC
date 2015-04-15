@@ -10,6 +10,7 @@ public class SPacket07SpawnPlayer extends ServerPacket {
     private String name;
     private byte playerID;
     private Position pos;
+
     public SPacket07SpawnPlayer(Server server, User client) {
         super(server, client);
     }

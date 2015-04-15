@@ -40,6 +40,18 @@ public class FancyFormatter extends Formatter {
     }
 
     @Override
+    public String format(LogRecord rec) {
+        String html = "<div>";
+        html += formatDate(rec.getMillis());
+        String tag = levelTagMap.get(rec.getLevel());
+        html += "<" + tag + ">";
+        html += rec.getMessage();
+        html += "</" + tag + ">";
+        html += "</div>";
+        return html;
+    }
+
+    @Override
     public String getHead(Handler h) {
         return head.replace("{date}", headDateFormat.format(new Date()));
     }
@@ -53,17 +65,5 @@ public class FancyFormatter extends Formatter {
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         Date d = new Date(ms);
         return f.format(d);
-    }
-
-    @Override
-    public String format(LogRecord rec) {
-        String html = "<div>";
-        html += formatDate(rec.getMillis());
-        String tag = levelTagMap.get(rec.getLevel());
-        html += "<" + tag + ">";
-        html += rec.getMessage();
-        html += "</" + tag + ">";
-        html += "</div>";
-        return html;
     }
 }

@@ -9,6 +9,7 @@ public class SPacket03LevelData extends ServerPacket {
     private short length;
     private byte[] chunk;
     private int progress;
+
     public SPacket03LevelData(Server server, User client) {
         super(server, client);
     }

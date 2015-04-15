@@ -57,9 +57,39 @@ public class Server implements Runnable {
         loadedLevels = new HashMap<>();
         // if (!loadedLevels.containsKey(config.getValue("MainWorld")))
         // create it and load it, else load it
-        loadedLevels.put(config.getValue("MainWorld", "main"), new Level());
+        loadedLevels.put(config.getValue("MainWorld", "main"), new Level(64, 64, 64));
     }
 
+    public void setupLogFiles() {
+        try {
+            File logDir = new File("logs");
+            if (!logDir.exists()) {
+                logDir.mkdir();
+            }
+
+            boolean fancy = config.getBoolean("MakeFancyLogs", false);
+            NuclearMC.getLogger().config("MakeFancyLogs = " + fancy);
+
+            FileHandler fhandler = new FileHandler("logs/server.log" + (fancy ? ".html" : ""));
+            fhandler.setLevel(java.util.logging.Level.CONFIG);
+
+            if (fancy) {
+                fhandler.setFormatter(new FancyFormatter());
+            } else {
+                fhandler.setFormatter(new ConsoleFormatter());
+            }
+
+            NuclearMC.getLogger().addHandler(fhandler);
+        } catch (SecurityException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Register a packet for the server to recieve
+     *
+     * @param packet The class of the packet
+     */
     public static void registerPacket(Class<? extends Packet> packet) {
         Packet p;
         try {
@@ -86,6 +116,20 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * Add a user to the server
+     *
+     * @param user The user to add
+     */
+    public void addUser(User user) {
+        users.add(user);
+    }
+
+    /**
+     * Generate a 16-character Base-62 string
+     *
+     * @return The generated salt
+     */
     public static String generateSalt() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random rand = new Random();
@@ -98,10 +142,76 @@ public class Server implements Runnable {
         return new String(buf);
     }
 
-    public boolean isRunning() {
-        return running;
+    /**
+     * Broadcast a packet to all users on the server
+     *
+     * @param packet          The packet to send
+     * @param includeOriginal Should the packet be sent to the original recipient?
+     * @deprecated Most packets are world specific. In the event that you need to invoke it on all users, please
+     * iterate over the levels instead.
+     */
+    @Deprecated
+    public void broadcast(ServerPacket packet, boolean includeOriginal) {
+        User originalUser = packet.getRecipient();
+
+        for (User user : users) {
+            if (!includeOriginal && user.equals(originalUser)) // temporary
+                continue;
+
+            packet.setRecipient(user);
+            try {
+                packet.send();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        packet.setRecipient(originalUser);
     }
 
+    /**
+     * Broadcast a packet to all users on a level
+     *
+     * @param packet          The packet to send
+     * @param includeOriginal Should the packet be sent to the original recipient?
+     * @param level           The level to send it to
+     */
+    public void broadcast(ServerPacket packet, boolean includeOriginal, Level level) {
+        User originalUser = packet.getRecipient();
+
+        for (User user : level.getUsers()) {
+            if (!includeOriginal && user.equals(originalUser)) // temporary
+                continue;
+
+            packet.setRecipient(user);
+            try {
+                packet.send();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        packet.setRecipient(originalUser);
+    }
+
+    /**
+     * Broadcast a chat message to all users on the server
+     *
+     * @param msg The chat message to send
+     */
+    public void broadcastMessage(String msg) {
+        for (User user : users) {
+            user.sendMessage(msg);
+        }
+    }
+
+    /**
+     * Beat the heart, smash it open, allow the blood flowing through the arteries to spill out, cause a mess
+     * on the new carpet that the mailman just shat on so that you have to clean two people's messes
+     * and a dead body.
+     *
+     * @param callback A callback to run when the process is complete.
+     */
     public void heartbeat(final HeartbeatCallback callback) {
         Thread t = new Thread(new Runnable() {
             @Override
@@ -173,39 +283,111 @@ public class Server implements Runnable {
         t.run();
     }
 
-    public void setupLogFiles() {
-        try {
-            File logDir = new File("logs");
-            if (!logDir.exists()) {
-                logDir.mkdir();
-            }
-
-            boolean fancy = config.getBoolean("MakeFancyLogs", false);
-            NuclearMC.getLogger().config("MakeFancyLogs = " + fancy);
-
-            FileHandler fhandler = new FileHandler("logs/server.log" + (fancy ? ".html" : ""));
-            fhandler.setLevel(java.util.logging.Level.CONFIG);
-
-            if (fancy) {
-                fhandler.setFormatter(new FancyFormatter());
-            } else {
-                fhandler.setFormatter(new ConsoleFormatter());
-            }
-
-            NuclearMC.getLogger().addHandler(fhandler);
-        } catch (SecurityException | IOException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Removes a user from the server
+     *
+     * @param user The user to remove
+     */
+    public void disconnectUser(User user) {
+        users.remove(user);
     }
 
+    /**
+     * Gets a loaded level from its name
+     *
+     * @param levelName The level name
+     * @return The level
+     */
+    public Level getLoadedLevel(String levelName) {
+        return loadedLevels.get(levelName);
+    }
+
+    /**
+     * Gets a list of loaded levels
+     *
+     * @return The list of loaded levels
+     */
+    public HashMap<String, Level> getLoadedLevels() {
+        if (loadedLevels instanceof HashMap)
+            return (HashMap<String, Level>) loadedLevels;
+        else
+            return null;
+    }
+
+    /**
+     * Gets a list of online users
+     *
+     * @return The list of online users
+     */
     public User[] getOnlineUsers() {
         return users.toArray(new User[0]);
     }
 
-    public void addUser(User user) {
-        users.add(user);
+    /**
+     * Gets the server's main level
+     *
+     * @return The main level
+     */
+    public Level getMainLevel() {
+        return loadedLevels.get(config.getValue("MainWorld", "main"));
     }
 
+    /**
+     * Gets the message of the day
+     *
+     * @return The message of the day
+     */
+    public String getMotd() {
+        return motd;
+    }
+
+    /**
+     * Gets the server configuration
+     *
+     * @return The server configuration
+     */
+    public ServerConfig getServerConfig() {
+        return config;
+    }
+
+    /**
+     * Gets the server name
+     *
+     * @return The server name
+     */
+    public String getServerName() {
+        return serverName;
+    }
+
+    /**
+     * Is the server running?
+     *
+     * @return Is the server running?
+     */
+    public boolean isRunning() {
+        return running;
+    }
+
+    /**
+     * Kicks a player from the server
+     *
+     * @param player The player to kick, by name
+     * @param reason The message to display to the kicked player, and in the console
+     */
+    public void kickPlayer(String player, String reason) {
+        for (User user : users) {
+            if (user.getUsername().equals(player)) {
+                kickUser(user, reason);
+            }
+        }
+    }
+
+    /**
+     * Kicks a user from the server
+     *
+     * @param user   The user to kick
+     * @param reason The message to display to the kicked user, and in the console
+     */
     public void kickUser(User user, String reason) {
         users.remove(user);
 
@@ -220,42 +402,38 @@ public class Server implements Runnable {
         user.getChannel().close();
     }
 
-    public void kickPlayer(String player, String reason) {
-        for (User user : users) {
-            if (user.getUsername().equals(player)) {
-                kickUser(user, reason);
-            }
-        }
-    }
-
+    /**
+     * Makes a unique player ID.
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * <p/>
+     * I lied. It's currently not unique.
+     * <p/>
+     * Please revise.
+     *
+     * @return The fake fucking id
+     */
+    // TO-DO make this actually fucking unique
     public byte makeUniquePlayerID() {
         lastPlayerID++;
-        return (byte)(lastPlayerID-1);
+        return (byte) (lastPlayerID - 1);
     }
 
-    public HashMap<String, Level> getLoadedLevels() {
-        if (loadedLevels instanceof HashMap)
-            return (HashMap<String, Level>) loadedLevels;
-        else
-            return null;
-    }
-
-    public Level getLoadedLevel(String levelName) {
-        return loadedLevels.get(levelName);
-    }
-
-    public Level getMainLevel() {
-        return loadedLevels.get(config.getValue("MainWorld", "main"));
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public String getMotd() {
-        return motd;
-    }
-
+    /**
+     * Updates the server
+     *
+     * @param dt time passed since last update
+     */
     public void update(float dt) {
         heartbeatTimer += dt;
         if (heartbeatTimer >= heartbeatInterval) {
@@ -272,62 +450,6 @@ public class Server implements Runnable {
         }
     }
 
-    /**
-     * Broadcast a packet to all users on the server
-     * @param packet The packet to send
-     * @param includeOriginal Should the packet be sent to the original recipient?
-     */
-    public void broadcast(ServerPacket packet, boolean includeOriginal) {
-        User originalUser = packet.getRecipient();
-
-        for (User user : users) {
-            if (!includeOriginal && user.getPlayerID() == originalUser.getPlayerID()) // temporary
-                continue;
-
-            packet.setRecipient(user);
-            try {
-                packet.send();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        packet.setRecipient(originalUser);
-    }
-
-    /**
-     * Broadcast a packet to all users on a level
-     * @param packet The packet to send
-     * @param includeOriginal Should the packet be sent to the original recipient?
-     * @param level The level to send it to
-     */
-    public void broadcast(ServerPacket packet, boolean includeOriginal, Level level) {
-        User originalUser = packet.getRecipient();
-
-        for (User user : level.getUsers()) {
-            if (!includeOriginal && user.getPlayerID() == originalUser.getPlayerID()) // temporary
-                continue;
-
-            packet.setRecipient(user);
-            try {
-                packet.send();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        packet.setRecipient(originalUser);
-    }
-
-    /**
-     * Broadcast a chat message to all users on the server
-     * @param msg The chat message to send
-     */
-    public void broadcastMessage(String msg) {
-        for (User user : users) {
-            user.sendMessage(msg);
-        }
-    }
 
     @Override
     public void run() {
@@ -388,19 +510,17 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * Kicks everyone out of the house and then bulldozes it.
+     * <p/>
+     * It seems rude at first, but it's actually pretty polite. You don't want to bulldoze the people
+     * while they're inside of it, do you?
+     */
     public void closeServer() {
         NuclearMC.getLogger().info("Server closing down");
 
         for (int i = 0; i < users.size(); i++) {
             kickUser(users.get(i), config.getValue("ShutdownMessage", "Server is shutting down"));
         }
-    }
-
-    public ServerConfig getServerConfig() {
-        return config;
-    }
-
-    public void disconnectUser(User user) {
-        users.remove(user);
     }
 }

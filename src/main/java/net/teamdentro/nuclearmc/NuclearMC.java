@@ -15,8 +15,22 @@ public class NuclearMC {
     private static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private static GUI gui;
 
-    public static Logger getLogger() {
-        return LOGGER;
+    /**
+     * Get the GUI instance
+     *
+     * @return The GUI instance or null
+     */
+    public static GUI getGUI() {
+        return gui;
+    }
+
+    /**
+     * Is the server running in GUI mode?
+     *
+     * @return Is the server running in GUI mode?
+     */
+    public static boolean isGUI() {
+        return gui != null;
     }
 
     public static void main(String[] args) {
@@ -48,14 +62,18 @@ public class NuclearMC {
         Server.instance.run();
     }
 
-    public static boolean isGUI() {
-        return gui != null;
+    /**
+     * Get the logger
+     *
+     * @return The logger
+     */
+    public static Logger getLogger() {
+        return LOGGER;
     }
 
-    public static GUI getGUI() {
-        return gui;
-    }
-
+    /**
+     * Shut the server down
+     */
     public static void shutDown() {
         Server.instance.closeServer();
         if (gui != null) gui.dispose();

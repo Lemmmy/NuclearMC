@@ -21,44 +21,20 @@ public class Position {
         this.pitch = pitch;
     }
 
-    public short getX() {
-        return x;
-    }
-
-    public void setX(short x) {
-        this.x = x;
-    }
-
-    public short getY() {
-        return y;
-    }
-
-    public void setY(short y) {
-        this.y = y;
-    }
-
-    public short getZ() {
-        return z;
-    }
-
-    public void setZ(short z) {
-        this.z = z;
-    }
-
-    public byte getYaw() {
-        return yaw;
-    }
-
-    public void setYaw(byte yaw) {
-        this.yaw = yaw;
-    }
-
     public byte getPitch() {
         return pitch;
     }
 
     public void setPitch(byte pitch) {
         this.pitch = pitch;
+    }
+
+    public short getX() {
+        return x;
+    }
+
+    public void setX(short x) {
+        this.x = x;
     }
 
     public double getXAsDouble() {
@@ -69,12 +45,36 @@ public class Position {
         this.x = (short) (x * 32);
     }
 
+    public short getY() {
+        return y;
+    }
+
+    public void setY(short y) {
+        this.y = y;
+    }
+
     public double getYAsDouble() {
         return (double) (y / 32);
     }
 
     public void setYAsDouble(double y) {
         this.y = (short) (y * 32);
+    }
+
+    public byte getYaw() {
+        return yaw;
+    }
+
+    public void setYaw(byte yaw) {
+        this.yaw = yaw;
+    }
+
+    public short getZ() {
+        return z;
+    }
+
+    public void setZ(short z) {
+        this.z = z;
     }
 
     public double getZAsDouble() {

@@ -9,16 +9,17 @@ public class SPacket04LevelFinalise extends ServerPacket {
     private int width;
     private int height;
     private int depth;
+
     public SPacket04LevelFinalise(Server server, User client) {
         super(server, client);
     }
 
-    public int getWidth() {
-        return width;
+    public int getDepth() {
+        return depth;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 
     public int getHeight() {
@@ -29,12 +30,12 @@ public class SPacket04LevelFinalise extends ServerPacket {
         this.height = height;
     }
 
-    public int getDepth() {
-        return depth;
+    public int getWidth() {
+        return width;
     }
 
-    public void setDepth(int depth) {
-        this.depth = depth;
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     @Override

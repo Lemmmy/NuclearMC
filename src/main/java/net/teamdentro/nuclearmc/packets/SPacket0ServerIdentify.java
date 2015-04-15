@@ -1,6 +1,5 @@
 package net.teamdentro.nuclearmc.packets;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 

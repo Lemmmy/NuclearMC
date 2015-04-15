@@ -106,6 +106,46 @@ public class GUI extends JFrame {
         trayIcon.setImageAutoSize(true);
     }
 
+    private void components() {
+        setLayout(new BorderLayout());
+
+        consoleArea = new JPanel(new BorderLayout());
+        sidebarArea = new JPanel(new BorderLayout());
+        extendableSidebarArea = new JPanel();
+        extendableSidebarArea.setLayout(new GridLayout());
+        ((GridLayout) extendableSidebarArea.getLayout()).setRows(1);
+
+        inputField = new JTextField();
+        consoleArea.add(inputField, BorderLayout.PAGE_END);
+
+        consoleTextArea = new JTextArea();
+        consoleTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
+
+        JScrollPane consoleScrollPane = new JScrollPane(consoleTextArea);
+        consoleScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        consoleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        consoleArea.add(consoleScrollPane, BorderLayout.CENTER);
+
+        usersListPopupMenu = new JPopupMenu();
+
+        usersListModel = new DefaultListModel<>();
+        usersList = new JList(usersListModel);
+        usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        usersList.setComponentPopupMenu(usersListPopupMenu);
+        usersList.setLayoutOrientation(JList.VERTICAL);
+
+        extendableSidebarArea.add(usersList);
+
+        settingsButton = new JButton("Settings");
+
+        sidebarArea.add(extendableSidebarArea, BorderLayout.CENTER);
+        sidebarArea.add(settingsButton, BorderLayout.PAGE_END);
+
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, consoleArea, sidebarArea);
+        splitPane.setResizeWeight(0.8);
+        add(splitPane, BorderLayout.CENTER);
+    }
+
     private void listeners() {
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -178,44 +218,8 @@ public class GUI extends JFrame {
         });
     }
 
-    private void components() {
-        setLayout(new BorderLayout());
-
-        consoleArea = new JPanel(new BorderLayout());
-        sidebarArea = new JPanel(new BorderLayout());
-        extendableSidebarArea = new JPanel();
-        extendableSidebarArea.setLayout(new GridLayout());
-        ((GridLayout) extendableSidebarArea.getLayout()).setRows(1);
-
-        inputField = new JTextField();
-        consoleArea.add(inputField, BorderLayout.PAGE_END);
-
-        consoleTextArea = new JTextArea();
-        consoleTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
-
-        JScrollPane consoleScrollPane = new JScrollPane(consoleTextArea);
-        consoleScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        consoleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        consoleArea.add(consoleScrollPane, BorderLayout.CENTER);
-
-        usersListPopupMenu = new JPopupMenu();
-
-        usersListModel = new DefaultListModel<>();
-        usersList = new JList(usersListModel);
-        usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        usersList.setComponentPopupMenu(usersListPopupMenu);
-        usersList.setLayoutOrientation(JList.VERTICAL);
-
-        extendableSidebarArea.add(usersList);
-
-        settingsButton = new JButton("Settings");
-
-        sidebarArea.add(extendableSidebarArea, BorderLayout.CENTER);
-        sidebarArea.add(settingsButton, BorderLayout.PAGE_END);
-
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, consoleArea, sidebarArea);
-        splitPane.setResizeWeight(0.8);
-        add(splitPane, BorderLayout.CENTER);
+    private void shutDown() {
+        NuclearMC.shutDown();
     }
 
     /**
@@ -225,8 +229,16 @@ public class GUI extends JFrame {
         new SettingsScreen(this);
     }
 
-    private void shutDown() {
-        NuclearMC.shutDown();
+    /**
+     * Long winded name for a simple method
+     *
+     * @param text           The text to have on the menu item
+     * @param actionListener The listener for when the menu item is clicked
+     */
+    public void addUsersListPopupMenuItem(String text, ActionListener actionListener) {
+        JMenuItem menuItem = new JMenuItem(text);
+        menuItem.addActionListener(actionListener);
+        usersListPopupMenu.add(menuItem);
     }
 
     /**
@@ -239,14 +251,10 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Long winded name for a simple method
+     * Get the GUI's console text area. Used for plugins
+     *
+     * @return The GUI's console text area
      */
-    public void addUsersListPopupMenuItem(String text, ActionListener actionListener) {
-        JMenuItem menuItem = new JMenuItem(text);
-        menuItem.addActionListener(actionListener);
-        usersListPopupMenu.add(menuItem);
-    }
-
     public JTextArea getTextArea() {
         return consoleTextArea;
     }

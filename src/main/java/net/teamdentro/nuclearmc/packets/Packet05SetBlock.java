@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.Blocks;
 import net.teamdentro.nuclearmc.Server;
-import net.teamdentro.nuclearmc.util.Position;
 
 public class Packet05SetBlock extends Packet {
     public Packet05SetBlock(Server server, Channel client, ByteBuf data) {
@@ -25,8 +24,8 @@ public class Packet05SetBlock extends Packet {
         byte block = data.readByte();
 
         if (mode == (byte) 0x00)
-            getUser().getCurrentLevel().setBlockLOUDLY(posx, posy, posz, Blocks.AIR);
+            getUser().getLevel().setBlockLOUDLY(posx, posy, posz, Blocks.AIR);
         else
-            getUser().getCurrentLevel().setBlockLOUDLY(posx, posy, posz, Blocks.values()[block]);
+            getUser().getLevel().setBlockLOUDLY(posx, posy, posz, Blocks.values()[block]);
     }
 }
