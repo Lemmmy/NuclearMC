@@ -15,3 +15,6 @@ config.lua
 /build
 /lib/
 /gradle/
+plugins/
+config/
+gradlew

@@ -7,6 +7,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import net.teamdentro.nuclearmc.packets.*;
+import net.teamdentro.nuclearmc.plugin.PluginManager;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -43,6 +44,7 @@ public class Server implements Runnable {
     private Map<String, Level> loadedLevels;
     private float heartbeatTimer;
     private String serverURL = "";
+    private PluginManager pluginManager = new PluginManager();
 
     public Server() {
         running = false;
@@ -53,6 +55,8 @@ public class Server implements Runnable {
         heartbeatInterval = (int) (heartbeatTimer = config.getInt("HeartbeatInterval", 45));
         serverName = config.getValue("Name", "My NuclearMC Server");
         motd = config.getValue("MOTD", "Welcome to my NuclearMC Server!");
+
+        pluginManager.loadPlugin("default");
 
         loadedLevels = new HashMap<>();
         // if (!loadedLevels.containsKey(config.getValue("MainWorld")))
@@ -83,6 +87,13 @@ public class Server implements Runnable {
         } catch (SecurityException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @return The server's plugin manager.
+     */
+    public PluginManager getPluginManager() {
+        return pluginManager;
     }
 
     /**

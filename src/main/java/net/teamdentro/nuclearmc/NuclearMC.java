@@ -3,6 +3,9 @@ package net.teamdentro.nuclearmc;
 import net.teamdentro.nuclearmc.gui.GUI;
 import net.teamdentro.nuclearmc.gui.GUILogHandler;
 
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
@@ -33,7 +36,26 @@ public class NuclearMC {
         return gui != null;
     }
 
+    private static void createFolderStructure() {
+        File defDir = new File("default");
+        if (!defDir.exists()) {
+            defDir.mkdir();
+        }
+
+        File pluginsDir = new File("plugins");
+        if (!pluginsDir.exists()) {
+            pluginsDir.mkdir();
+        }
+
+        File configDir = new File("config");
+        if (!configDir.exists()) {
+            configDir.mkdir();
+        }
+    }
+
     public static void main(String[] args) {
+        createFolderStructure();
+
         List<String> arguments = Arrays.asList(args);
 
         MAIN_THREAD_ID = Thread.currentThread().getId();
