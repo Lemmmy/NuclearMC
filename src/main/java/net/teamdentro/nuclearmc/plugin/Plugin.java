@@ -1,6 +1,7 @@
 package net.teamdentro.nuclearmc.plugin;
 
 import org.luaj.vm2.*;
+import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.io.*;
@@ -42,5 +43,12 @@ public abstract class Plugin implements Closeable {
         }
 
         return lua.loadfile(file).call();
+    }
+
+    public class GetPathFunc extends ZeroArgFunction {
+        @Override
+        public LuaValue call() {
+            return null;
+        }
     }
 }

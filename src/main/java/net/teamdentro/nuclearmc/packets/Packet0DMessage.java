@@ -5,6 +5,8 @@ import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import net.teamdentro.nuclearmc.event.EventPostUserConnect;
+import net.teamdentro.nuclearmc.event.EventUserMessage;
 
 import java.io.IOException;
 
@@ -30,9 +32,10 @@ public class Packet0DMessage extends Packet {
             User user = getUser();
 
             if (user != null) {
-                // temporary message sending: this will probably be handled by plugins
-                server.broadcastMessage("<" + user.getUsername() + "> " + message);
-                NuclearMC.getLogger().info("<" + user.getUsername() + "> " + message);
+                EventUserMessage eventUserMessage = new EventUserMessage();
+                eventUserMessage.setUser(user);
+                eventUserMessage.setMessage(message);
+                eventUserMessage.invoke();
             }
         } catch (IOException e) {
         }

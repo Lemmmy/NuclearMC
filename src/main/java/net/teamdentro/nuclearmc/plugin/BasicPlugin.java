@@ -27,6 +27,8 @@ public class BasicPlugin extends Plugin {
         }
 
         this.file = file;
+
+        getGlobals().set("path", file.getPath());
     }
 
     @Override
