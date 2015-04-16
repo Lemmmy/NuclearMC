@@ -35,6 +35,7 @@ public class PluginGlobals {
             }
         });
 
-        lua.load(new ServerLib());
+        lua.set("Server", lua.load(new ServerLib()));
+        lua.set("Event", lua.load(new EventLib()));
     }
 }

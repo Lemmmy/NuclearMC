@@ -28,7 +28,7 @@ public abstract class Plugin implements Closeable {
     public abstract LuaValue run(String filename, boolean ignoreFileExistence) throws IOException, LuaError;
 
     protected static LuaValue runFile(String filename) throws LuaError {
-        return lua.loadfile(filename);
+        return lua.loadfile(filename).call();
     }
 
     protected static LuaValue runFromStream(InputStream stream) throws IOException, LuaError {
@@ -41,6 +41,6 @@ public abstract class Plugin implements Closeable {
             file += line;
         }
 
-        return lua.loadfile(file);
+        return lua.loadfile(file).call();
     }
 }

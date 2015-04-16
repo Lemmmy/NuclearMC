@@ -5,6 +5,8 @@ import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import net.teamdentro.nuclearmc.event.EventPostUserConnect;
+import net.teamdentro.nuclearmc.event.EventPreUserConnect;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -32,6 +34,14 @@ public class Packet0Connect extends Packet {
             key = readString().trim();
             userdata = data.readByte();
 
+            EventPreUserConnect eventPreUserConnect = new EventPreUserConnect();
+            eventPreUserConnect.setProtVersion(protVersion);
+            eventPreUserConnect.setUsername(username);
+            eventPreUserConnect.setUserdata(userdata);
+            eventPreUserConnect.invoke();
+
+            if (eventPreUserConnect.isCancelled()) return;
+
             User user = new User(username, (InetSocketAddress) client.remoteAddress(), ((InetSocketAddress) client.remoteAddress()).getPort(), client);
             user.setPlayerID(server.makeUniquePlayerID());
             user.setLevel(server.getMainLevel());
@@ -44,6 +54,10 @@ public class Packet0Connect extends Packet {
             identify.send();
 
             user.setLevel(server.getMainLevel());
+
+            EventPostUserConnect eventPostUserConnect = new EventPostUserConnect();
+            eventPostUserConnect.setUser(user);
+            eventPostUserConnect.invoke();
         } catch (IOException ignored) {
         }
     }

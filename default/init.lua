@@ -1,7 +1,7 @@
 NUCLEARMC_PLUGIN_VERSION = "1.0"
 print("Running Default NuclearMC Plugin v" .. NUCLEARMC_PLUGIN_VERSION)
 
-local config = NMC.getConfig("default")
+local config = Server.getConfig("default")
 
 DefaultSettings = {
 	ConnectMessage = "${player} has joined the game.",
@@ -30,3 +30,11 @@ end
 
 config:copyToTable(DefaultSettings)
 print(DefaultSettings.ConnectMessage)
+
+Event.addListener("PreUserConnect", function (args)
+		print("PreUserConnect " .. args["protVersion"] .. " " .. args["username"] .. " " .. args["userdata"])
+	end)
+
+Event.addListener("PostUserConnect", function (args)
+		print("PostUserConnect " .. args["user"])
+	end)

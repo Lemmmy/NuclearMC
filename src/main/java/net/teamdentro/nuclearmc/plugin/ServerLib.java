@@ -2,7 +2,6 @@ package net.teamdentro.nuclearmc.plugin;
 
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
-import org.luaj.vm2.Lua;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -25,9 +24,6 @@ public class ServerLib extends OneArgFunction {
         lib.set("kickPlayer", new KickTheFeckinPlayer());
         lib.set("disconnectPlayer", new TellThemToFeckOff());
         lib.set("closeServer", new CloseServerFunc());
-
-        env.set("server", lib);
-        env.get("package").get("loaded").set("server", lib);
 
         return lib;
     }
