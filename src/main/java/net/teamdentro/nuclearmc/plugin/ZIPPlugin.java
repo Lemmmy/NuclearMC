@@ -5,6 +5,8 @@ import org.luaj.vm2.LuaValue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -19,7 +21,15 @@ public class ZIPPlugin extends Plugin {
     }
 
     public ZIPPlugin(ZipFile zip) {
+        super();
         file = zip;
+    }
+
+    @Override
+    public String getWorkingDirectory() {
+        Path filePath = Paths.get(file.getName()).getParent().toAbsolutePath();
+        Path wdir = Paths.get(filePath.toString(), Paths.get(file.getName()).getFileName().toString());
+        return wdir.toString();
     }
 
     public LuaValue run(String filename, boolean ignoreFileExistence) throws IOException, LuaError {
@@ -30,7 +40,7 @@ public class ZIPPlugin extends Plugin {
         }
 
         try (InputStream in = file.getInputStream(entry)) {
-            return runFromStream(in);
+            return runFromStream(in, entry.getName());
         }
     }
 

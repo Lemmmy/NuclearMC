@@ -8,44 +8,51 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.io.*;
+import java.nio.file.Paths;
 
 /**
  * Created by Lignum on 15/04/2015.
  */
 public abstract class Plugin implements Closeable {
-    protected static Globals lua;
-    protected static LuaTable nmcApi;
+    protected Globals lua;
+    protected PluginLib pluginLib;
 
     static {
-        lua = JsePlatform.standardGlobals();
-        PluginGlobals.set(lua);
     }
 
-    public static Globals getGlobals() {
+    public Plugin() {
+        lua = JsePlatform.standardGlobals();
+        pluginLib = new PluginLib(this);
+
+    }
+
+    public abstract String getWorkingDirectory();
+
+    public Globals getGlobals() {
         return lua;
     }
 
-    public static void addGlobal(String key, LuaValue value) {
+    public void setGlobal(String key, LuaValue value) {
         lua.set(key, value);
     }
 
     public abstract LuaValue run(String filename, boolean ignoreFileExistence) throws IOException, LuaError;
 
-    protected static LuaValue runFile(String filename) throws LuaError {
-        return lua.loadfile(filename).call();
-    }
-
-    protected static LuaValue runFromStream(InputStream stream) throws IOException, LuaError {
-        String file = "";
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        String line = "";
-
-        while ((line = reader.readLine()) != null) {
-            file += line;
+    protected LuaValue runFile(String filename) throws LuaError {
+        try (FileInputStream fis = new FileInputStream(filename);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fis))) {
+            return lua.load(reader, Paths.get(filename).getFileName().toString()).call();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        return lua.loadfile(file).call();
+        return null;
+    }
+
+    protected LuaValue runFromStream(InputStream stream, String chunkName) throws IOException, LuaError {
+        return lua.load(stream, chunkName, "bt", LuaValue.NIL).call();
     }
 
     public class GetPathFunc extends ZeroArgFunction {

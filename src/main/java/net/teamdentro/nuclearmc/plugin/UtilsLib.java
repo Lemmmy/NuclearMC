@@ -10,7 +10,7 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TextUtilsLib extends OneArgFunction {
+public class UtilsLib extends OneArgFunction {
     @Override
     public LuaValue call(LuaValue env) {
         LuaValue lib = tableOf();

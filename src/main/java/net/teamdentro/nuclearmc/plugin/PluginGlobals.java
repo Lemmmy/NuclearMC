@@ -25,7 +25,7 @@ public class PluginGlobals {
             }
         });
 
-        lua.set("error", new OneArgFunction() {
+        lua.set("severe", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue arg) {
                 String msg = arg.checkjstring();
@@ -36,6 +36,6 @@ public class PluginGlobals {
 
         lua.set("Server", lua.load(new ServerLib()));
         lua.set("Event", lua.load(new EventLib()));
-        lua.set("TextUtils", lua.load(new TextUtilsLib()));
+        lua.set("TextUtils", lua.load(new UtilsLib()));
     }
 }

@@ -19,13 +19,18 @@ public class BasicPlugin extends Plugin {
     }
 
     public BasicPlugin(File file) {
+        super();
+
         if (!file.isDirectory()) {
             throw new IllegalArgumentException("basic plugin file must be a directory!");
         }
 
         this.file = file;
+    }
 
-        getGlobals().set("path", file.getPath());
+    @Override
+    public String getWorkingDirectory() {
+        return file.getAbsolutePath();
     }
 
     @Override
