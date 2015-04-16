@@ -4,7 +4,9 @@ local config = Server.getConfig("default")
 
 DefaultSettings = {
 	ConnectMessage = "${player} has joined the game.",
-	DisconnectMessage = "${player} has left the game."
+	DisconnectMessage = "${player} has left the game.",
+
+	UserMessage = "<${player}> ${message}"
 }
 
 if config:isEmpty() then

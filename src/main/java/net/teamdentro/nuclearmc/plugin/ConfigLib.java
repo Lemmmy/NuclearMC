@@ -1,7 +1,6 @@
 package net.teamdentro.nuclearmc.plugin;
 
 import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaUserdata;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;

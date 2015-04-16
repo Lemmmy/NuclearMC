@@ -1,6 +1,5 @@
 package net.teamdentro.nuclearmc.plugin;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 
@@ -8,8 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.logging.Level;
 
 /**
  * Created by Lignum on 15/04/2015.
@@ -46,5 +43,6 @@ public class BasicPlugin extends Plugin {
     }
 
     @Override
-    public void close() throws IOException {}
+    public void close() throws IOException {
+    }
 }

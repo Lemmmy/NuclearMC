@@ -2,7 +2,6 @@ package net.teamdentro.nuclearmc.plugin;
 
 import net.teamdentro.nuclearmc.NuclearMC;
 import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 
@@ -37,5 +36,6 @@ public class PluginGlobals {
 
         lua.set("Server", lua.load(new ServerLib()));
         lua.set("Event", lua.load(new EventLib()));
+        lua.set("TextUtils", lua.load(new TextUtilsLib()));
     }
 }

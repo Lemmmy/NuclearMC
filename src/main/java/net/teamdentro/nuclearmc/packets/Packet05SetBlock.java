@@ -24,8 +24,8 @@ public class Packet05SetBlock extends Packet {
         byte block = data.readByte();
 
         if (mode == (byte) 0x00)
-            getUser().getLevel().setBlockLOUDLY(posx, posy, posz, Blocks.AIR);
+            getUser().getLevel().setBlockNotify(posx, posy, posz, Blocks.AIR);
         else
-            getUser().getLevel().setBlockLOUDLY(posx, posy, posz, Blocks.values()[block]);
+            getUser().getLevel().setBlockNotify(posx, posy, posz, Blocks.values()[block]);
     }
 }

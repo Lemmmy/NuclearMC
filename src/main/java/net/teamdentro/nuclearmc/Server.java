@@ -59,7 +59,7 @@ public class Server implements Runnable {
         loadedLevels = new HashMap<>();
         // if (!loadedLevels.containsKey(config.getValue("MainWorld")))
         // create it and load it, else load it
-        loadedLevels.put(config.getValue("MainWorld", "main"), new Level(64, 64, 64));
+        loadedLevels.put(config.getValue("MainWorld", "main"), new Level("main", 64, 64, 64));
     }
 
     public void setupLogFiles() {

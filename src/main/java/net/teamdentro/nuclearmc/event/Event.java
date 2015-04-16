@@ -15,6 +15,7 @@ public abstract class Event {
     static {
         registerEvent(EventPreUserConnect.class);
         registerEvent(EventPostUserConnect.class);
+        registerEvent(EventUserMessage.class);
     }
 
     public static void registerEvent(Class<? extends Event> event) {

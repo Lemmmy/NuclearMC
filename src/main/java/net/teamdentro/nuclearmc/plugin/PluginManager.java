@@ -3,14 +3,13 @@ package net.teamdentro.nuclearmc.plugin;
 import net.teamdentro.nuclearmc.NuclearMC;
 import org.luaj.vm2.LuaError;
 
-import java.io.*;
-import java.nio.file.Path;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Created by Lignum on 15/04/2015.

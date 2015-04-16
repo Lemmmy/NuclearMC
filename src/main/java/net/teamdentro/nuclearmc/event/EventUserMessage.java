@@ -3,6 +3,7 @@ package net.teamdentro.nuclearmc.event;
 import net.teamdentro.nuclearmc.User;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
@@ -29,7 +30,8 @@ public class EventUserMessage extends Event {
             for (LuaFunction listener : getListeners()) {
                 listener.invoke(LuaValue.varargsOf(new LuaValue[]{
                         CoerceJavaToLua.coerce(this),
-                        CoerceJavaToLua.coerce(user)
+                        CoerceJavaToLua.coerce(user),
+                        LuaString.valueOf(message)
                 }));
             }
         } catch (LuaError e) {

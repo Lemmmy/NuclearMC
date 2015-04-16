@@ -3,7 +3,6 @@ package net.teamdentro.nuclearmc.plugin;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;

@@ -17,6 +17,7 @@ public class Level {
     private int width, height, depth;
     private int spawnX, spawnY, spawnZ;
     private Random rand = new Random();
+    private String name;
 
     /**
      * Create a new level with the specified dimensions
@@ -25,7 +26,8 @@ public class Level {
      * @param h The height of the level (y axis). Must be a power of two.
      * @param d The depth of the level (z axis). Must be a power of two.
      */
-    public Level(int w, int h, int d) {
+    public Level(String name, int w, int h, int d) {
+        this.name = name;
         width = w;
         height = h;
         depth = d;
@@ -59,7 +61,7 @@ public class Level {
      * @param y     The Y position
      * @param z     The Z position
      * @param block The Blocks block to set at the specified coordinates
-     * @see #setBlockLOUDLY(int, int, int, Blocks)
+     * @see #setBlockNotify(int, int, int, Blocks)
      */
     public void setBlock(int x, int y, int z, Blocks block) {
         blocks[getIndex(x, y, z)] = (byte) block.getId();
@@ -233,7 +235,7 @@ public class Level {
      * @param block The Blocks block to set at the specified coordinates
      * @see #setBlock(int, int, int, Blocks)
      */
-    public void setBlockLOUDLY(int x, int y, int z, Blocks block) {
+    public void setBlockNotify(int x, int y, int z, Blocks block) {
         setBlock(x, y, z, block);
 
         SPacket06SetBlock packet = new SPacket06SetBlock(Server.instance, null);
@@ -243,5 +245,13 @@ public class Level {
         packet.setBlock(block.getId());
 
         Server.instance.broadcast(packet, true, this);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

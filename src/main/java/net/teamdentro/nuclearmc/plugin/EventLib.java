@@ -1,7 +1,5 @@
 package net.teamdentro.nuclearmc.plugin;
 
-import net.teamdentro.nuclearmc.NuclearMC;
-import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.event.Event;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
