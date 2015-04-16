@@ -1,6 +1,5 @@
 package net.teamdentro.nuclearmc.event;
 
-import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 
 import java.util.ArrayList;
@@ -11,12 +10,6 @@ public abstract class Event {
     private static Map<String, Class<? extends Event>> events = new HashMap<>();
     private static Map<String, ArrayList<LuaFunction>> listeners = new HashMap<>();
     private boolean cancelled;
-
-    static {
-        registerEvent(EventPreUserConnect.class);
-        registerEvent(EventPostUserConnect.class);
-        registerEvent(EventUserMessage.class);
-    }
 
     public static void registerEvent(Class<? extends Event> event) {
         Event e;

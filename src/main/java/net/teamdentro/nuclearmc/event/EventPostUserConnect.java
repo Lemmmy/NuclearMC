@@ -1,16 +1,17 @@
 package net.teamdentro.nuclearmc.event;
 
-import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.User;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.LibFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 public class EventPostUserConnect extends Event {
     private User user;
+
+    static {
+        registerEvent(EventPostUserConnect.class);
+    }
 
     @Override
     public String getName() {

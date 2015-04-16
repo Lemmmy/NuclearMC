@@ -10,6 +10,10 @@ public class EventPreUserConnect extends Event {
     private String username;
     private byte userdata;
 
+    static {
+        registerEvent(EventPreUserConnect.class);
+    }
+
     @Override
     public String getName() {
         return "PreUserConnect";

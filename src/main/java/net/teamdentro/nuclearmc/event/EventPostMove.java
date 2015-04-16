@@ -1,31 +1,31 @@
 package net.teamdentro.nuclearmc.event;
 
 import net.teamdentro.nuclearmc.User;
+import net.teamdentro.nuclearmc.util.Position;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
-public class EventUserMessage extends Event {
+public class EventPostMove extends Event {
     private User user;
-    private String message;
+    private Position position;
 
     static {
-        registerEvent(EventUserMessage.class);
+        registerEvent(EventPostMove.class);
     }
 
     @Override
     public String getName() {
-        return "UserMessage";
+        return "PostMove";
     }
 
     public void setUser(User user) {
         this.user = user;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class EventUserMessage extends Event {
                 listener.invoke(LuaValue.varargsOf(new LuaValue[]{
                         CoerceJavaToLua.coerce(this),
                         CoerceJavaToLua.coerce(user),
-                        LuaString.valueOf(message)
+                        CoerceJavaToLua.coerce(position)
                 }));
             }
         } catch (LuaError e) {

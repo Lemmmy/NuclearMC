@@ -3,6 +3,8 @@ package net.teamdentro.nuclearmc.packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.Server;
+import net.teamdentro.nuclearmc.event.EventPostMove;
+import net.teamdentro.nuclearmc.event.EventPreMove;
 import net.teamdentro.nuclearmc.util.Position;
 
 public class Packet08Teleport extends Packet {
@@ -27,6 +29,18 @@ public class Packet08Teleport extends Packet {
 
         Position pos = new Position(posx, posy, posz, yaw, pitch);
 
+        EventPreMove event = new EventPreMove();
+        event.setUser(getUser());
+        event.setPosition(pos);
+        event.invoke();
+
+        if (event.isCancelled()) return;
+
         getUser().setPos(pos, false);
+
+        EventPostMove eventPost = new EventPostMove();
+        eventPost.setUser(getUser());
+        eventPost.setPosition(pos);
+        eventPost.invoke();
     }
 }
