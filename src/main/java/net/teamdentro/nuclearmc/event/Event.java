@@ -1,5 +1,6 @@
 package net.teamdentro.nuclearmc.event;
 
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 
 import java.util.ArrayList;

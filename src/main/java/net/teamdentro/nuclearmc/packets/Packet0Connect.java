@@ -47,7 +47,7 @@ public class Packet0Connect extends Packet {
             user.setLevel(server.getMainLevel());
             server.addUser(user);
 
-            NuclearMC.getLogger().info("Player " + username + " [" + user.getAddress().toString() + ":" + user.getPort() + "] (EID " + user.getPlayerID() + ")");
+            NuclearMC.getLogger().info("Player " + username + " [" + user.getAddress().toString() + ":" + user.getPort() + "] (EID " + user.getPlayerID() + ") connected");
 
             SPacket0ServerIdentify identify = new SPacket0ServerIdentify(server, user);
             identify.setOp(true);

@@ -1,6 +1,8 @@
 package net.teamdentro.nuclearmc.event;
 
+import net.teamdentro.nuclearmc.NuclearMC;
 import net.teamdentro.nuclearmc.User;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -21,12 +23,15 @@ public class EventPostUserConnect extends Event {
 
     @Override
     public void invoke() {
-        for (LuaFunction listener : getListeners()) {
-            LuaTable args = new LuaTable();
-            args.set("event", CoerceJavaToLua.coerce(this));
-            args.set("user", CoerceJavaToLua.coerce(user));
-
-            listener.call(args);
+        try {
+            for (LuaFunction listener : getListeners()) {
+                listener.invoke(LuaValue.varargsOf(new LuaValue[]{
+                        CoerceJavaToLua.coerce(this),
+                        CoerceJavaToLua.coerce(user)
+                }));
+            }
+        } catch (LuaError e) {
+            e.printStackTrace();
         }
     }
 }

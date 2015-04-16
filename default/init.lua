@@ -31,10 +31,10 @@ end
 config:copyToTable(DefaultSettings)
 print(DefaultSettings.ConnectMessage)
 
-Event.addListener("PreUserConnect", function (args)
-		print("PreUserConnect " .. args["protVersion"] .. " " .. args["username"] .. " " .. args["userdata"])
+Event.addListener("PreUserConnect", function (ev, a, b, c)
+		print("PreUserConnect " .. a)
 	end)
 
-Event.addListener("PostUserConnect", function (args)
-		print("PostUserConnect " .. args["user"])
+Event.addListener("PostUserConnect", function (ev, a)
+		print("PostUserConnect " .. ev:getName())
 	end)
