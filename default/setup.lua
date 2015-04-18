@@ -3,8 +3,8 @@ NUCLEARMC_PLUGIN_VERSION = "INCOMPLETE"
 local config = Server.getConfig("default")
 
 DefaultSettings = {
-	ConnectMessage = "${player} has joined the game.",
-	DisconnectMessage = "${player} has left the game.",
+	ConnectMessage = "&e${player} has joined the game.",
+	DisconnectMessage = "&e${player} has left the game.",
 
 	UserMessage = "<${player}> ${message}",
 	

@@ -34,13 +34,18 @@ public abstract class Packet implements IPacket {
 
     public abstract void handle() throws IOException;
 
-    protected String readString() throws IOException {
-        int size = Util.clamp(data.readableBytes(), 0, 64);
+    protected String readString(int length) throws IOException {
+        int size = Math.min(data.readableBytes(), length);
 
         byte[] b = new byte[size];
         for (int i = 0; i < size; ++i) {
             b[i] = data.readByte();
         }
+
         return new String(b).trim();
+    }
+
+    protected String readString() throws IOException {
+        return readString(48);
     }
 }

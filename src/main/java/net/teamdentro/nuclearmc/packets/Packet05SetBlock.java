@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.Blocks;
 import net.teamdentro.nuclearmc.Server;
+import net.teamdentro.nuclearmc.User;
 import net.teamdentro.nuclearmc.event.EventSetBlock;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class Packet05SetBlock extends Packet {
         byte mode = data.readByte();
         byte block = data.readByte();
 
+        Blocks newBlock = Blocks.values()[block];
         Blocks currentBlock = getUser().getLevel().getBlock(posx, posy, posz);
 
         EventSetBlock event = new EventSetBlock();
@@ -34,11 +36,13 @@ public class Packet05SetBlock extends Packet {
         event.setPosy(posy);
         event.setPosz(posz);
         event.setMode(mode);
-        event.setBlock(mode == 0 ? Blocks.AIR : Blocks.values()[block]);
+        event.setBlock(mode == 0 ? Blocks.AIR : newBlock);
         event.setOldBlock(currentBlock);
         event.invoke();
 
-        if (event.isCancelled()) {
+        User user = getUser();
+
+        if (event.isCancelled() || (mode == 1 && newBlock == Blocks.BEDROCK && !user.isOp())) {
             SPacket06SetBlock setblock = new SPacket06SetBlock(server, getUser());
             setblock.setX(posx);
             setblock.setY(posy);
@@ -48,10 +52,10 @@ public class Packet05SetBlock extends Packet {
             return;
         }
 
-        if (mode == (byte) 0x00) {
-            getUser().getLevel().setBlockNotify(posx, posy, posz, Blocks.AIR);
+        if (mode == (byte)0) {
+            user.getLevel().setBlockNotify(posx, posy, posz, Blocks.AIR);
         } else {
-            getUser().getLevel().setBlockNotify(posx, posy, posz, Blocks.values()[block]);
+            user.getLevel().setBlockNotify(posx, posy, posz, Blocks.values()[block]);
         }
     }
 }

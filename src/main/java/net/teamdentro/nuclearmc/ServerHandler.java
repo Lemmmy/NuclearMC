@@ -55,11 +55,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                 Packet p = ((Class<? extends Packet>) packetClass).getDeclaredConstructor(Server.class, Channel.class, ByteBuf.class).newInstance(Server.instance, ctx.channel(), buf);
                 p.handle();
             }
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
         } catch (NoSuchMethodException e) {
             // invalid packet
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             ReferenceCountUtil.release(msg);

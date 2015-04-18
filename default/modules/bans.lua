@@ -32,7 +32,7 @@ end
 
 Event.addListener("SetBlock", function(ev, user, x, y, z, mode, block, oldBlock)
 	local banned = isBlockBanned(block)
-	if banned then
+	if mode == BlockMode.PLACE and banned then
 		user:sendMessage(DefaultSettings.BlockBannedMessage)
 		ev:setCancelled(true)
 	end

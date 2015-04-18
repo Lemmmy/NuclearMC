@@ -209,6 +209,8 @@ public class Server implements Runnable {
      * @param msg The chat message to send
      */
     public void broadcastMessage(String msg) {
+        NuclearMC.getLogger().info(msg);
+
         for (User user : users) {
             user.sendMessage(msg);
         }

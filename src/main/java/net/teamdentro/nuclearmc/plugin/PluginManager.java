@@ -1,6 +1,7 @@
 package net.teamdentro.nuclearmc.plugin;
 
 import net.teamdentro.nuclearmc.NuclearMC;
+import org.apache.commons.io.FilenameUtils;
 import org.luaj.vm2.LuaError;
 
 import java.io.Closeable;
@@ -103,8 +104,11 @@ public class PluginManager implements Closeable {
     }
 
     public Plugin loadPlugin(String dir, boolean runInit) throws IOException {
+        String name = FilenameUtils.removeExtension(FilenameUtils.getName(dir));
+
         try {
             BasicPlugin plugin = new BasicPlugin(dir);
+            plugin.name = name;
             loadedPlugins.add(plugin);
 
             if (runInit) {
@@ -113,15 +117,18 @@ public class PluginManager implements Closeable {
 
             return plugin;
         } catch (LuaError err) {
-            NuclearMC.getLogger().severe("Failed to load plugin from directory " + Paths.get(dir).getFileName() + ": " + err.getMessage());
+            NuclearMC.getLogger().severe("Failed to load plugin " + name + ": " + err.getMessage());
         }
 
         return null;
     }
 
     public Plugin loadPluginFromZIP(String zip, boolean runInit) throws IOException {
+        String name = FilenameUtils.removeExtension(FilenameUtils.getName(zip));
+
         try {
             ZIPPlugin plugin = new ZIPPlugin(zip);
+            plugin.name = name;
             loadedPlugins.add(plugin);
 
             if (runInit) {
@@ -130,7 +137,7 @@ public class PluginManager implements Closeable {
 
             return plugin;
         } catch (LuaError err) {
-            NuclearMC.getLogger().severe("Failed to load plugin from file " + Paths.get(zip).getFileName() + ": " + err.getMessage());
+            NuclearMC.getLogger().severe("Failed to load plugin " + name + ": " + err.getMessage());
         }
 
         return null;
@@ -139,7 +146,11 @@ public class PluginManager implements Closeable {
     @Override
     public void close() throws IOException {
         for (Plugin plugin : loadedPlugins) {
-            plugin.run("shutdown.lua", true);
+            try {
+                plugin.run("shutdown.lua", true);
+            } catch (LuaError e) {
+                NuclearMC.getLogger().severe("Error in plugin " + plugin.getName() + " during shutdown: " + e.getMessage());
+            }
             plugin.close();
         }
     }

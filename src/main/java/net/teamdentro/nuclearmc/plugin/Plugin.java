@@ -17,6 +17,7 @@ public abstract class Plugin implements Closeable {
     protected Globals lua;
     protected PluginLib pluginLib;
     protected boolean def = false;
+    protected String name;
 
     static {
     }
@@ -31,6 +32,10 @@ public abstract class Plugin implements Closeable {
      */
     public boolean isDefault() {
         return def;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public abstract String getWorkingDirectory();
