@@ -30,7 +30,11 @@ public class BasicPlugin extends Plugin {
 
     @Override
     public String getWorkingDirectory() {
-        return file.getAbsolutePath();
+        if (!isDefault()) {
+            return file.getAbsolutePath();
+        } else {
+            return Paths.get(file.getAbsolutePath(), "..").toAbsolutePath().toString();
+        }
     }
 
     @Override

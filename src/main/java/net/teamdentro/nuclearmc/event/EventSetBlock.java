@@ -2,24 +2,22 @@ package net.teamdentro.nuclearmc.event;
 
 import net.teamdentro.nuclearmc.Blocks;
 import net.teamdentro.nuclearmc.User;
+import net.teamdentro.nuclearmc.plugin.PluginGlobals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
-public class EventPostSetBlock extends Event {
+public class EventSetBlock extends Event {
     private User user;
     private short posx,posy,posz;
     private byte mode;
     private Blocks block;
-
-    static {
-        registerEvent(EventPostSetBlock.class);
-    }
+    private Blocks oldBlock;
 
     @Override
     public String getName() {
-        return "PostSetBlock";
+        return "SetBlock";
     }
 
     public void setUser(User user) {
@@ -46,6 +44,14 @@ public class EventPostSetBlock extends Event {
         this.block = block;
     }
 
+    public Blocks getOldBlock() {
+        return oldBlock;
+    }
+
+    public void setOldBlock(Blocks oldBlock) {
+        this.oldBlock = oldBlock;
+    }
+
     @Override
     public void invoke() {
         try {
@@ -57,7 +63,8 @@ public class EventPostSetBlock extends Event {
                         LuaValue.valueOf(posy),
                         LuaValue.valueOf(posz),
                         LuaValue.valueOf(mode),
-                        CoerceJavaToLua.coerce(block)
+                        PluginGlobals.getLuaBlock(block),
+                        PluginGlobals.getLuaBlock(oldBlock)
                 }));
             }
         } catch (LuaError e) {

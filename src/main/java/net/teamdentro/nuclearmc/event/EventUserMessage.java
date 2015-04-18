@@ -11,10 +11,6 @@ public class EventUserMessage extends Event {
     private User user;
     private String message;
 
-    static {
-        registerEvent(EventUserMessage.class);
-    }
-
     @Override
     public String getName() {
         return "UserMessage";

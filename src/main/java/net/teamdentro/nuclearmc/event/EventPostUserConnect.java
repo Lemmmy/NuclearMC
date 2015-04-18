@@ -9,10 +9,6 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 public class EventPostUserConnect extends Event {
     private User user;
 
-    static {
-        registerEvent(EventPostUserConnect.class);
-    }
-
     @Override
     public String getName() {
         return "PostUserConnect";

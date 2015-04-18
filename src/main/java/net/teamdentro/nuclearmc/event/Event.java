@@ -1,5 +1,6 @@
 package net.teamdentro.nuclearmc.event;
 
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 
 import java.util.ArrayList;
@@ -10,6 +11,16 @@ public abstract class Event {
     private static Map<String, Class<? extends Event>> events = new HashMap<>();
     private static Map<String, ArrayList<LuaFunction>> listeners = new HashMap<>();
     private boolean cancelled;
+
+    static {
+        registerEvent(EventPostMove.class);
+        registerEvent(EventSetBlock.class);
+        registerEvent(EventPostUserConnect.class);
+        registerEvent(EventPreMove.class);
+        registerEvent(EventSetBlock.class);
+        registerEvent(EventPreUserConnect.class);
+        registerEvent(EventUserMessage.class);
+    }
 
     public static void registerEvent(Class<? extends Event> event) {
         Event e;
@@ -23,6 +34,10 @@ public abstract class Event {
     }
 
     public static void addListener(String event, LuaFunction listener) {
+        if (!listeners.containsKey(event)) {
+            throw new LuaError("no such event type");
+        }
+
         listeners.get(event).add(listener);
     }
 
@@ -40,6 +55,4 @@ public abstract class Event {
     public ArrayList<LuaFunction> getListeners() {
         return listeners.get(getName());
     }
-
-
 }

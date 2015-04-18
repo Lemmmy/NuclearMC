@@ -6,6 +6,7 @@ import org.luaj.vm2.LuaError;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class PluginManager implements Closeable {
     private List<Plugin> loadedPlugins = new ArrayList<Plugin>();
 
     public void loadPlugins(String dir) {
-        File d = new File(dir);
+        File d = new File(dir).getAbsoluteFile();
         if (!d.isDirectory()) {
             throw new IllegalArgumentException("tried to load plugins from non-directory file!");
         }
@@ -27,20 +28,32 @@ public class PluginManager implements Closeable {
 
         try {
             File defDir = new File(d.getParentFile(), "default");
-            Plugin plugin = loadAnyPlugin(defDir.getAbsolutePath());
+            File assetsDir = defDir.getParentFile();
+
+            if (!assetsDir.exists()) {
+                assetsDir.mkdir();
+            }
+
+            Plugin plugin = loadAnyPlugin(defDir.getAbsolutePath(), false);
+            plugin.def = true;
+            plugin.run("init.lua", true);
+
             if (plugin != null) {
                 NuclearMC.getLogger().info("\t- [\u2713] Default");
             } else {
                 NuclearMC.getLogger().info("\t- [X] Default");
             }
+        } catch (LuaError err) {
+            NuclearMC.getLogger().severe("Failed to load default plugin: " + err.getMessage());
+            NuclearMC.getLogger().info("\t- [X] Default");
         } catch (Exception e) {
-            NuclearMC.getLogger().log(Level.SEVERE, "Error while loading default plugin!", e);
+            NuclearMC.getLogger().log(Level.SEVERE, e.getClass().getName() + " while loading default plugin: " + e.getMessage(), e);
         }
 
         for (File f : d.listFiles()) {
             try {
                 if (f.isDirectory()) {
-                    Plugin p = loadPlugin(f.getAbsolutePath());
+                    Plugin p = loadPlugin(f.getAbsolutePath(), true);
                     String c = "\u2713";
                     if (p == null) {
                         c = "X";
@@ -54,7 +67,7 @@ public class PluginManager implements Closeable {
                             name = name.substring(0, pos);
                         }
 
-                        Plugin p = loadPluginFromZIP(f.getAbsolutePath());
+                        Plugin p = loadPluginFromZIP(f.getAbsolutePath(), true);
                         String c = "\u2713";
                         if (p == null) {
                             c = "X";
@@ -69,11 +82,11 @@ public class PluginManager implements Closeable {
         }
     }
 
-    public Plugin loadAnyPlugin(String file) throws IOException {
+    public Plugin loadAnyPlugin(String file, boolean runInit) throws IOException {
         File f = new File(file);
 
         if (f.isDirectory()) {
-            return loadPlugin(f.getAbsolutePath());
+            return loadPlugin(f.getAbsolutePath(), runInit);
         } else {
             if (f.getName().endsWith(".zip") || f.getName().endsWith(".plugin")) {
                 String name = f.getName();
@@ -82,18 +95,22 @@ public class PluginManager implements Closeable {
                     name = name.substring(0, pos);
                 }
 
-                return loadPluginFromZIP(f.getAbsolutePath());
+                return loadPluginFromZIP(f.getAbsolutePath(), runInit);
             }
         }
 
         return null;
     }
 
-    public Plugin loadPlugin(String dir) throws IOException {
+    public Plugin loadPlugin(String dir, boolean runInit) throws IOException {
         try {
             BasicPlugin plugin = new BasicPlugin(dir);
             loadedPlugins.add(plugin);
-            plugin.run("init.lua", true);
+
+            if (runInit) {
+                plugin.run("init.lua", true);
+            }
+
             return plugin;
         } catch (LuaError err) {
             NuclearMC.getLogger().severe("Failed to load plugin from directory " + Paths.get(dir).getFileName() + ": " + err.getMessage());
@@ -102,11 +119,15 @@ public class PluginManager implements Closeable {
         return null;
     }
 
-    public Plugin loadPluginFromZIP(String zip) throws IOException {
+    public Plugin loadPluginFromZIP(String zip, boolean runInit) throws IOException {
         try {
             ZIPPlugin plugin = new ZIPPlugin(zip);
             loadedPlugins.add(plugin);
-            plugin.run("init.lua", true);
+
+            if (runInit) {
+                plugin.run("init.lua", true);
+            }
+
             return plugin;
         } catch (LuaError err) {
             NuclearMC.getLogger().severe("Failed to load plugin from file " + Paths.get(zip).getFileName() + ": " + err.getMessage());

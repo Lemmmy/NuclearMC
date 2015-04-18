@@ -32,7 +32,7 @@ public abstract class Packet implements IPacket {
         return null;
     }
 
-    public abstract void handle();
+    public abstract void handle() throws IOException;
 
     protected String readString() throws IOException {
         int size = Util.clamp(data.readableBytes(), 0, 64);

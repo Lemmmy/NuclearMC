@@ -6,7 +6,9 @@ DefaultSettings = {
 	ConnectMessage = "${player} has joined the game.",
 	DisconnectMessage = "${player} has left the game.",
 
-	UserMessage = "<${player}> ${message}"
+	UserMessage = "<${player}> ${message}",
+	
+	BlockBannedMessage = "&cThis block is banned from the server."
 }
 
 if config:isEmpty() then

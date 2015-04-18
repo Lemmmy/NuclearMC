@@ -1,5 +1,6 @@
 package net.teamdentro.nuclearmc.event;
 
+import net.teamdentro.nuclearmc.Server;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
@@ -10,9 +11,8 @@ public class EventPreUserConnect extends Event {
     private String username;
     private byte userdata;
 
-    static {
-        registerEvent(EventPreUserConnect.class);
-    }
+    private boolean kicked;
+    private String kickReason;
 
     @Override
     public String getName() {
@@ -31,14 +31,27 @@ public class EventPreUserConnect extends Event {
         this.userdata = userdata;
     }
 
+    public boolean isKicked() {
+        return kicked;
+    }
+
+    public String getKickReason() {
+        return kickReason;
+    }
+
+    public void kick(String reason) {
+        kicked = true;
+        kickReason = reason;
+    }
+
     @Override
     public void invoke() {
         try {
             for (LuaFunction listener : getListeners()) {
                 listener.invoke(LuaValue.varargsOf(new LuaValue[]{
                         CoerceJavaToLua.coerce(this),
-                        LuaValue.valueOf(protVersion),
                         LuaValue.valueOf(username),
+                        LuaValue.valueOf(protVersion),
                         LuaValue.valueOf(userdata)
                 }));
             }

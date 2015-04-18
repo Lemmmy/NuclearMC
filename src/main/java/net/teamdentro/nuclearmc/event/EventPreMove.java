@@ -11,10 +11,6 @@ public class EventPreMove extends Event {
     private User user;
     private Position position;
 
-    static {
-        registerEvent(EventPreMove.class);
-    }
-
     @Override
     public String getName() {
         return "PreMove";

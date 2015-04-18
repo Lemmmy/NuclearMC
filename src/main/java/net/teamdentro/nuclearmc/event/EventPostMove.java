@@ -11,10 +11,6 @@ public class EventPostMove extends Event {
     private User user;
     private Position position;
 
-    static {
-        registerEvent(EventPostMove.class);
-    }
-
     @Override
     public String getName() {
         return "PostMove";

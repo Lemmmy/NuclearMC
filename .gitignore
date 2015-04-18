@@ -1,6 +1,5 @@
 bin/
 logs/
-config.txt
 target/
 .idea/
 *.iml
@@ -18,3 +17,4 @@ config.lua
 plugins/
 config/
 gradlew
+*.txt

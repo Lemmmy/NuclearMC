@@ -16,14 +16,21 @@ import java.nio.file.Paths;
 public abstract class Plugin implements Closeable {
     protected Globals lua;
     protected PluginLib pluginLib;
+    protected boolean def = false;
 
     static {
     }
 
     public Plugin() {
         lua = JsePlatform.standardGlobals();
-        pluginLib = new PluginLib(this);
+        PluginGlobals.set(this, lua);
+    }
 
+    /**
+     * Is this the default plugin?
+     */
+    public boolean isDefault() {
+        return def;
     }
 
     public abstract String getWorkingDirectory();
@@ -53,12 +60,5 @@ public abstract class Plugin implements Closeable {
 
     protected LuaValue runFromStream(InputStream stream, String chunkName) throws IOException, LuaError {
         return lua.load(stream, chunkName, "bt", LuaValue.NIL).call();
-    }
-
-    public class GetPathFunc extends ZeroArgFunction {
-        @Override
-        public LuaValue call() {
-            return null;
-        }
     }
 }

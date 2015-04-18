@@ -18,8 +18,9 @@ public class EventLib extends OneArgFunction {
     private class AddListenerFunc extends TwoArgFunction {
         @Override
         public LuaValue call(LuaValue eventType, LuaValue func) {
-            if (eventType.isstring() && func.isfunction())
+            if (eventType.isstring() && func.isfunction()) {
                 Event.addListener(eventType.tojstring(), func.checkfunction());
+            }
 
             return null;
         }

@@ -1,3 +1,5 @@
-dofile(path.."/setup.lua")
-dofile(path.."/modules/bans.lua")
-dofile(path.."/modules/chat.lua")
+print("Working directory is " .. Plugin.getWorkingDirectory())
+
+Plugin.run("setup.lua")
+Plugin.run("modules/bans.lua")
+Plugin.run("modules/chat.lua")

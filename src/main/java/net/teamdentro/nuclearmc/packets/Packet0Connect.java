@@ -40,18 +40,28 @@ public class Packet0Connect extends Packet {
             eventPreUserConnect.setUserdata(userdata);
             eventPreUserConnect.invoke();
 
-            if (eventPreUserConnect.isCancelled()) return;
-
             User user = new User(username, (InetSocketAddress) client.remoteAddress(), ((InetSocketAddress) client.remoteAddress()).getPort(), client);
+
+            if (eventPreUserConnect.isKicked()) {
+                SPacket0EDisconnect dc = new SPacket0EDisconnect(server, user);
+                dc.setReason(eventPreUserConnect.getKickReason());
+                dc.send();
+
+                user.getChannel().close();
+                return;
+            }
+
+            if (eventPreUserConnect.isCancelled()) {
+                return;
+            }
+
+            SPacket0ServerIdentify identify = new SPacket0ServerIdentify(server, user);
+            identify.setOp(user.isOp());
+            identify.send();
+
             user.setPlayerID(server.makeUniquePlayerID());
             user.setLevel(server.getMainLevel());
             server.addUser(user);
-
-            NuclearMC.getLogger().info("Player " + username + " [" + user.getAddress().toString() + ":" + user.getPort() + "] (EID " + user.getPlayerID() + ") connected");
-
-            SPacket0ServerIdentify identify = new SPacket0ServerIdentify(server, user);
-            identify.setOp(true);
-            identify.send();
 
             user.setLevel(server.getMainLevel());
 

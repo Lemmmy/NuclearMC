@@ -17,6 +17,7 @@ public class User {
     private Channel socket;
     private byte playerID;
     private Position pos;
+    private boolean op = false;
 
     private Level level;
 
@@ -52,6 +53,16 @@ public class User {
 
         User user = (User) obj;
         return user.getUsername().equals(username) && user.getPlayerID() == playerID;
+    }
+
+
+    /**
+     * Gets whether the user is a server operator.
+     *
+     * @return Whether the user is a server operator.
+     */
+    public boolean isOp() {
+        return op;
     }
 
     /**

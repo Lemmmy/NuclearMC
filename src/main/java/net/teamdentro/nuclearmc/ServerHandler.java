@@ -8,6 +8,7 @@ import io.netty.util.ReferenceCountUtil;
 import net.teamdentro.nuclearmc.packets.IPacket;
 import net.teamdentro.nuclearmc.packets.Packet;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 
@@ -58,6 +59,8 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
             // invalid packet
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             ReferenceCountUtil.release(msg);
         }
