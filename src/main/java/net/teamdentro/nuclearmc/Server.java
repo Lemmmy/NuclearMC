@@ -6,6 +6,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import net.teamdentro.nuclearmc.event.EventTick;
 import net.teamdentro.nuclearmc.packets.*;
 import net.teamdentro.nuclearmc.plugin.PluginManager;
 
@@ -477,6 +478,10 @@ public class Server implements Runnable {
                 }
             });
         }
+
+        EventTick tick = new EventTick();
+        tick.setDt(dt);
+        tick.invoke();
     }
 
 
@@ -531,7 +536,7 @@ public class Server implements Runnable {
                 lastTime = System.currentTimeMillis();
 
                 try {
-                    Thread.sleep(16);
+                    Thread.sleep(50); // 1/20 * 1000 = 50 (20tps)
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -21,6 +21,7 @@ public abstract class Event {
         registerEvent(EventPreUserConnect.class);
         registerEvent(EventUserMessage.class);
         registerEvent(EventUserDisconnect.class);
+        registerEvent(EventTick.class);
     }
 
     public static void registerEvent(Class<? extends Event> event) {
