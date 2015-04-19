@@ -485,7 +485,7 @@ public class Server implements Runnable {
         String address = config.getValue("ServerIP", "0.0.0.0");
         int port = config.getInt("ServerPort", 25565);
 
-        NuclearMC.getLogger().info("Starting server on port " + port);
+        NuclearMC.getLogger().info("Starting server on " + address + ":" + port);
         running = true;
 
         try {
