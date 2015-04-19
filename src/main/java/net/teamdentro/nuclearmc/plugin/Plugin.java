@@ -52,18 +52,18 @@ public abstract class Plugin implements Closeable {
 
     protected LuaValue runFile(String filename) throws LuaError {
         try (FileInputStream fis = new FileInputStream(filename);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(fis))) {
+             BufferedReader reader = new BufferedReader(new InputStreamReader(fis))) {
             return lua.load(reader, Paths.get(filename).getFileName().toString()).call();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return LuaValue.NIL;
     }
 
     protected LuaValue runFromStream(InputStream stream, String chunkName) throws IOException, LuaError {
-        return lua.load(stream, chunkName, "bt", LuaValue.NIL).call();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+            return lua.load(reader, chunkName).call();
+        }
     }
 }
