@@ -1,6 +1,8 @@
 package net.teamdentro.nuclearmc.command;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,11 +38,52 @@ public abstract class Command {
         return commands.get(name);
     }
 
+    public static String[] listCategories() {
+        List<String> categories = new ArrayList<>();
+
+        for (Map.Entry<String, Command> e : commands.entrySet()) {
+            Command cmd = e.getValue();
+            if (!categories.contains(cmd.getCategory())) {
+                categories.add(cmd.getCategory());
+            }
+        }
+
+        return (String[]) categories.toArray();
+    }
+
+    public static Command[] listCommands() {
+        Command[] cmds = new Command[commands.size()];
+
+        int i = 0;
+        for (Map.Entry<String, Command> e : commands.entrySet()) {
+            i++;
+            cmds[i] = e.getValue();
+        }
+
+        return cmds;
+    }
+
+    public static Command[] listCommands(String category) {
+        Command[] cmds = new Command[]{};
+
+        int i = 0;
+        for (Map.Entry<String, Command> e : commands.entrySet()) {
+            if (e.getValue().getCategory().toLowerCase().startsWith(category.toLowerCase())) {
+                i++;
+                cmds[i] = e.getValue();
+            }
+        }
+
+        return cmds;
+    }
+
     public abstract String[] getAliases();
 
     public abstract String getName();
 
     public abstract String getUsage();
 
-    public abstract boolean execute(CommandSender sender);
+    public abstract String getCategory();
+
+    public abstract boolean execute(CommandSender sender, String[] args);
 }

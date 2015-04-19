@@ -1,24 +1,19 @@
 package net.teamdentro.nuclearmc.command;
 
-import net.teamdentro.nuclearmc.NuclearMC;
-
-/**
- * Created by Lignum on 19/04/2015.
- */
-public class CommandNMCInfo extends Command {
+public class CommandHelp extends Command {
     @Override
     public String[] getAliases() {
-        return new String[0];
+        return new String[]{"commands"};
     }
 
     @Override
     public String getName() {
-        return "nmcinfo";
+        return "help";
     }
 
     @Override
     public String getUsage() {
-        return "";
+        return "[category]";
     }
 
     @Override
@@ -28,7 +23,6 @@ public class CommandNMCInfo extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
-        sender.sendMessage("&aThis server is running NuclearMC v" + NuclearMC.getVersion());
         return true;
     }
 }
