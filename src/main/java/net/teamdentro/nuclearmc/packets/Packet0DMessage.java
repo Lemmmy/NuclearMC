@@ -7,6 +7,7 @@ import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
 import net.teamdentro.nuclearmc.event.EventPostUserConnect;
 import net.teamdentro.nuclearmc.event.EventUserMessage;
+import net.teamdentro.nuclearmc.plugin.Commands;
 
 import java.io.IOException;
 
@@ -30,14 +31,22 @@ public class Packet0DMessage extends Packet {
             message = readString();
 
             User user = getUser();
+            String cmdPrefix = server.getServerConfig().getValue("CommandPrefix", "/");
 
             if (user != null) {
-                EventUserMessage eventUserMessage = new EventUserMessage();
-                eventUserMessage.setUser(user);
-                eventUserMessage.setMessage(message);
-                eventUserMessage.invoke();
+                if (message.trim().startsWith(cmdPrefix)) {
+                    String[] args = message.trim().substring(1).split(" ");
+                    String cmd = args[0];
+
+                    Commands.invokeCommand(cmd, getUser(), args);
+                } else {
+                    EventUserMessage eventUserMessage = new EventUserMessage();
+                    eventUserMessage.setUser(user);
+                    eventUserMessage.setMessage(message);
+                    eventUserMessage.invoke();
+                }
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
     }
 
