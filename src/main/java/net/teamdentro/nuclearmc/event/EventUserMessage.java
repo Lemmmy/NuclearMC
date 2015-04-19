@@ -27,7 +27,8 @@ public class EventUserMessage extends Event {
     @Override
     public void invoke() {
         try {
-            for (LuaFunction listener : getListeners()) {
+            for (int i = 0; i < getListeners().size(); ++i) {
+                LuaFunction listener = getListeners().get(i);
                 listener.invoke(LuaValue.varargsOf(new LuaValue[]{
                         CoerceJavaToLua.coerce(this),
                         CoerceJavaToLua.coerce(user),

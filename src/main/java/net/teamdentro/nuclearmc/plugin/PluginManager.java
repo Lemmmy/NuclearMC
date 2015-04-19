@@ -1,8 +1,11 @@
 package net.teamdentro.nuclearmc.plugin;
 
 import net.teamdentro.nuclearmc.NuclearMC;
+import net.teamdentro.nuclearmc.command.Command;
+import net.teamdentro.nuclearmc.event.Event;
 import org.apache.commons.io.FilenameUtils;
 import org.luaj.vm2.LuaError;
+import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.io.Closeable;
 import java.io.File;
@@ -141,6 +144,57 @@ public class PluginManager implements Closeable {
         }
 
         return null;
+    }
+
+    public boolean reloadPlugins() {
+        Command.clearCommands();
+        Event.clearListeners();
+
+        boolean success = true;
+
+        for (Plugin plugin : loadedPlugins) {
+            if (!reloadPlugin(plugin)) {
+                success = false;
+            }
+        }
+
+        return success;
+    }
+
+    private boolean reloadPlugin(Plugin plugin) {
+        plugin.lua = JsePlatform.standardGlobals();
+        PluginGlobals.set(plugin, plugin.lua);
+
+        boolean success = true;
+
+        try {
+            plugin.run("init.lua", true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (LuaError e) {
+            success = false;
+            NuclearMC.getLogger().severe("Failed to reload plugin " + plugin.getName() + ": " + e.getMessage());
+        }
+
+        return success;
+    }
+
+    private boolean reloadPlugin(String name) {
+        return reloadPlugin(getPlugin(name));
+    }
+
+    public Plugin getPlugin(String name) {
+        for (Plugin plugin : loadedPlugins) {
+            if (plugin.getName().equals(name)) {
+                return plugin;
+            }
+        }
+
+        return null;
+    }
+
+    public Plugin[] getPlugins() {
+        return loadedPlugins.toArray(new Plugin[0]);
     }
 
     @Override

@@ -42,6 +42,12 @@ public abstract class Event {
         listeners.get(event).add(listener);
     }
 
+    public static void clearListeners() {
+        for (Map.Entry<String, ArrayList<LuaFunction>> entry : listeners.entrySet()) {
+            entry.getValue().clear();
+        }
+    }
+
     public abstract String getName();
     public abstract void invoke();
 

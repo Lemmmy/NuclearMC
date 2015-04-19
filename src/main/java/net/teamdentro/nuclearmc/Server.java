@@ -139,7 +139,7 @@ public class Server implements Runnable {
      *
      * @return The generated salt
      */
-    public static String generateSalt() {
+    private static String generateSalt() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random rand = new Random();
 
@@ -149,6 +149,11 @@ public class Server implements Runnable {
             buf[i] = chars.charAt(rand.nextInt(chars.length()));
         }
         return new String(buf);
+    }
+
+    public void reload() {
+        config.loadConfig();
+        pluginManager.reloadPlugins();
     }
 
     /**

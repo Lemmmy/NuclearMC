@@ -12,6 +12,7 @@ public abstract class Command {
     static {
         // Register commands
         registerCommand(CommandNMCInfo.class);
+        registerCommand(CommandReload.class);
     }
 
     public static void registerCommand(Class<? extends Command> cmd) {
@@ -34,6 +35,10 @@ public abstract class Command {
         }
 
         return commands.get(name);
+    }
+
+    public static void clearCommands() {
+        commands.clear();
     }
 
     public abstract String[] getAliases();
