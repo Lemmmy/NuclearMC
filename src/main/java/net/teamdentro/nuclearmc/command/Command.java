@@ -17,6 +17,7 @@ public abstract class Command {
         // Register commands
         registerCommand(CommandNMCInfo.class);
         registerCommand(CommandReload.class);
+        registerCommand(CommandHelp.class);
     }
 
     public static void registerCommand(Class<? extends Command> cmd) {
@@ -55,7 +56,7 @@ public abstract class Command {
             }
         }
 
-        return (String[]) categories.toArray();
+        return categories.toArray(new String[0]);
     }
 
     public static Command[] listCommands() {

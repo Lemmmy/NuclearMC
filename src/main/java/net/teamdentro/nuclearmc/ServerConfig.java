@@ -35,7 +35,7 @@ public class ServerConfig {
 
         LuaValue lua = JsePlatform.standardGlobals();
         config = lua.get("dofile").call(
-                LuaValue.valueOf("config.default.lua")).checktable();
+                LuaValue.valueOf("config.lua")).checktable();
     }
 
     /**
