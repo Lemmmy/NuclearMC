@@ -1,6 +1,7 @@
 package net.teamdentro.nuclearmc;
 
 import io.netty.channel.Channel;
+import net.teamdentro.nuclearmc.command.CommandSender;
 import net.teamdentro.nuclearmc.packets.SPacket07SpawnPlayer;
 import net.teamdentro.nuclearmc.packets.SPacket08Teleport;
 import net.teamdentro.nuclearmc.packets.SPacket0CDespawnPlayer;
@@ -10,7 +11,7 @@ import net.teamdentro.nuclearmc.util.Position;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-public class User {
+public class User implements CommandSender {
     private InetSocketAddress sender;
     private int port;
     private String username;
@@ -110,6 +111,11 @@ public class User {
         sendMessage(message, Byte.MAX_VALUE);
     }
 
+    @Override
+    public boolean isPlayer() {
+        return true;
+    }
+
     /**
      * Sends a chat message to the user
      *
@@ -133,7 +139,7 @@ public class User {
      * @param pos      The new position
      * @param teleport Whether this is a teleport or not
      */
-    public void setPos(Position pos, boolean teleport) {
+    public void setPosition(Position pos, boolean teleport) {
         this.pos = pos;
 
         SPacket08Teleport packet = new SPacket08Teleport(Server.instance, this);
@@ -157,7 +163,7 @@ public class User {
      *
      * @return The user's position
      */
-    public Position getPos() {
+    public Position getPosition() {
         return pos;
     }
 
@@ -224,7 +230,7 @@ public class User {
             for (User u : getLevel().getUsers()) {
                 if (u.getPlayerID() == getPlayerID()) continue;
                 SPacket07SpawnPlayer s = new SPacket07SpawnPlayer(Server.instance, this);
-                s.setPos(u.getPos());
+                s.setPos(u.getPosition());
                 s.setPlayerID(u.getPlayerID());
                 s.setName(u.getUsername());
                 s.send();

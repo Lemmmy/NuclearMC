@@ -36,6 +36,10 @@ public class NuclearMC {
         return gui != null;
     }
 
+    public static String getVersion() {
+        return "1.0.0";
+    }
+
     private static void createFolderStructure() {
         File defDir = new File("default");
         if (!defDir.exists()) {
