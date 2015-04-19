@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import net.teamdentro.nuclearmc.event.EventUserDisconnect;
 import net.teamdentro.nuclearmc.packets.IPacket;
 import net.teamdentro.nuclearmc.packets.Packet;
 
@@ -24,7 +25,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             if (user.getAddress().equals(ctx.channel().remoteAddress()) && user.getPort() == ((InetSocketAddress) ctx.channel().remoteAddress()).getPort()) {
                 user.disconnect();
 
-                NuclearMC.getLogger().info("Player " + user.getUsername() + " was disconnected from the server");
+                EventUserDisconnect dc = new EventUserDisconnect();
+                dc.setUser(user);
+                dc.invoke();
 
                 Server.instance.disconnectUser(user);
             }

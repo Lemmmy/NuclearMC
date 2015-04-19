@@ -20,6 +20,7 @@ public abstract class Event {
         registerEvent(EventSetBlock.class);
         registerEvent(EventPreUserConnect.class);
         registerEvent(EventUserMessage.class);
+        registerEvent(EventUserDisconnect.class);
     }
 
     public static void registerEvent(Class<? extends Event> event) {

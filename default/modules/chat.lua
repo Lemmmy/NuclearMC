@@ -19,3 +19,13 @@ Event.addListener("PostUserConnect", function(ev, user)
 	
 	Server.broadcast(connectMessage)
 end)
+
+Event.addListener("UserDisconnect", function(ev, user)
+    local disconnectMessage = Utils.substitute(DefaultSettings.DisconnectMessage,
+    {
+        { "player", user:getUsername() },
+        { "id", user:getPlayerID() }
+    })
+
+    Server.broadcast(disconnectMessage)
+end)
