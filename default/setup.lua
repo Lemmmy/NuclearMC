@@ -8,7 +8,10 @@ DefaultSettings = {
 
 	UserMessage = "<${player}> ${message}",
 	
-	BlockBannedMessage = "&cThis block is banned from the server."
+	BlockBannedMessage = "&cThis block is banned from the server.",
+	
+	WrongUsage = "&cUsage: ${command} ${usage}",
+	UnknownCommand = "&cUnknown command."
 }
 
 if config:isEmpty() then

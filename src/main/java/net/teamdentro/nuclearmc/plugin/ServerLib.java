@@ -2,6 +2,7 @@ package net.teamdentro.nuclearmc.plugin;
 
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
+import net.teamdentro.nuclearmc.command.CommandSender;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -9,6 +10,7 @@ import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
+import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 
 public class ServerLib extends OneArgFunction {
     @Override
@@ -24,6 +26,7 @@ public class ServerLib extends OneArgFunction {
         lib.set("kickPlayer", new KickTheFeckinPlayer());
         lib.set("disconnectPlayer", new TellThemToFeckOff());
         lib.set("closeServer", new CloseServerFunc());
+        lib.set("toUser", new ToUser());
 
         return lib;
     }
@@ -96,6 +99,19 @@ public class ServerLib extends OneArgFunction {
             Server.instance.closeServer();
 
             return null;
+        }
+    }
+
+    private class ToUser extends OneArgFunction {
+        @Override
+        public LuaValue call(LuaValue arg) {
+            CommandSender sender = (CommandSender)arg.checkuserdata(CommandSender.class);
+            if (!(sender instanceof User)) {
+                return LuaValue.NIL;
+            }
+
+            User user = (User)sender;
+            return CoerceJavaToLua.coerce(user);
         }
     }
 }

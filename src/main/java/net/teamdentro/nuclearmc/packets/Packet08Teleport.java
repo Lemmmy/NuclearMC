@@ -36,7 +36,7 @@ public class Packet08Teleport extends Packet {
 
         if (event.isCancelled()) return;
 
-        getUser().setPos(pos, false);
+        getUser().setPosition(pos, false);
 
         EventPostMove eventPost = new EventPostMove();
         eventPost.setUser(getUser());

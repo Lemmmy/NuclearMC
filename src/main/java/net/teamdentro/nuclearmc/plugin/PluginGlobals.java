@@ -43,6 +43,7 @@ public class PluginGlobals {
         lua.set("Plugin", lua.load(new PluginLib(plugin)));
         lua.set("Blocks", lua.load(new BlocksLib()));
         lua.set("BlockMode", lua.load(new BlockModeLib()));
+        lua.set("Commands", lua.load(new CommandsLib()));
     }
 
     public static LuaTable getLuaBlock(Blocks b) {
