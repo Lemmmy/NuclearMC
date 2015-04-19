@@ -23,7 +23,12 @@ public class CommandReload extends Command {
     }
 
     @Override
-    public boolean execute(CommandSender sender) {
+    public String getCategory() {
+        return "server";
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, String[] args) {
         NuclearMC.getLogger().info("Reloading...");
 
         Server.instance.getServerConfig().loadConfig();

@@ -52,8 +52,21 @@ public class CommandsLib extends OneArgFunction {
                 }
 
                 @Override
-                public boolean execute(CommandSender sender) {
-                    boolean result = tbl.get("execute").call(CoerceJavaToLua.coerce(sender)).checkboolean();
+                public String getCategory() {
+                    return tbl.get("category").checkjstring();
+                }
+
+                @Override
+                public boolean execute(CommandSender sender, String[] args) {
+                    LuaTable argTable = new LuaTable();
+
+                    int i = 1;
+                    for (String arg : args) {
+                        argTable.set(i, arg);
+                        i++;
+                    }
+
+                    boolean result = tbl.get("execute").call(CoerceJavaToLua.coerce(sender), argTable).checkboolean();
                     return result;
                 }
             };

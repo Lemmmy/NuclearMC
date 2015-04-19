@@ -1,19 +1,35 @@
-Commands.addCommand("help", {
+local function parseCommand(cmd)
+	local noSlash = cmd:sub(2, #cmd)
+	local cmd, args = noSlash:match("^(%S+)%s?(.*)")
+	
+	local argTable = {}
+	
+	for arg in args:gmatch("%S+") do
+		table.insert(argTable, arg)
+	end
+	
+	return cmd, argTable
+end
+
+Commands.addCommand("test", {
 	usage = "",
-	execute = function(sender)
-		sender:sendMessage("&eNYI")
-		return true
+	category = "server",
+	
+	execute = function(sender, args)
+		sender:sendMessage("&eIt works!")
+		sender:sendMessage(table.concat(args, ' '))
+		return false
 	end
 })
 
 Event.addListener("UserMessage", function (ev, a, b)
 	if b:sub(1, 1) == "/" then
-		local command = b:sub(2, #b)
+		local command, arguments = parseCommand(b)
 		print(a:getUsername() .. " executed command " .. command)
 		
 		local cmd = Commands.getCommand(command)
 		if cmd ~= nil then
-			local success = cmd:execute(a)
+			local success = cmd:luaExecute(a, arguments)
 			if not success then
 				local message = Utils.substitute(DefaultSettings.WrongUsage,
 				{
