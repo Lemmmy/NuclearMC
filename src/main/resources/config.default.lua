@@ -9,8 +9,6 @@ return {
     {"MainWorld", "main"},
     {"ShutdownMessage", "Server is shutting down"},
 
-    {"CommandPrefix", "/"},
-
     {"HeartbeatInterval", 45},
 
     {"MakeFancyLogs", false},
