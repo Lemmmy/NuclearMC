@@ -8,7 +8,7 @@ import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
-public class EventSetBlock extends Event {
+public class EventPreSetBlock extends Event {
     private User user;
     private short posx,posy,posz;
     private byte mode;
@@ -17,7 +17,7 @@ public class EventSetBlock extends Event {
 
     @Override
     public String getName() {
-        return "SetBlock";
+        return "PreSetBlock";
     }
 
     public void setUser(User user) {

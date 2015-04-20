@@ -5,7 +5,7 @@ public enum Blocks {
     STONE(1),
     GRASS(2),
     DIRT(3),
-    COBBLESTONE(4),
+    COBBLESTONE(4, "COBBLE"),
     WOOD(5, "PLANK", "PLANKS", "WOODENPLANKS", "WOODPLANKS"),
     SAPLING(6, "PLANT"),
     BEDROCK(7, "ADMINIUM"),

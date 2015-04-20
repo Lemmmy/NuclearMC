@@ -30,7 +30,7 @@ local function isBlockBanned(block)
 	return false
 end
 
-Event.addListener("SetBlock", function(ev, user, x, y, z, mode, block, oldBlock)
+Event.addListener("PreSetBlock", function(ev, user, x, y, z, mode, block, oldBlock)
 	local banned = isBlockBanned(block)
 	if mode == BlockMode.PLACE and banned then
 		ev:setCancelled(true)

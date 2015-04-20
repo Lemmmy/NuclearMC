@@ -5,7 +5,8 @@ import io.netty.channel.Channel;
 import net.teamdentro.nuclearmc.Blocks;
 import net.teamdentro.nuclearmc.Server;
 import net.teamdentro.nuclearmc.User;
-import net.teamdentro.nuclearmc.event.EventSetBlock;
+import net.teamdentro.nuclearmc.event.EventPostSetBlock;
+import net.teamdentro.nuclearmc.event.EventPreSetBlock;
 
 import java.io.IOException;
 
@@ -30,7 +31,7 @@ public class Packet05SetBlock extends Packet {
         Blocks newBlock = Blocks.values()[block];
         Blocks currentBlock = getUser().getLevel().getBlock(posx, posy, posz);
 
-        EventSetBlock event = new EventSetBlock();
+        EventPreSetBlock event = new EventPreSetBlock();
         event.setUser(getUser());
         event.setPosx(posx);
         event.setPosy(posy);
@@ -57,5 +58,15 @@ public class Packet05SetBlock extends Packet {
         } else {
             user.getLevel().setBlockNotify(posx, posy, posz, Blocks.values()[block]);
         }
+
+        EventPostSetBlock eventPost = new EventPostSetBlock();
+        eventPost.setUser(getUser());
+        eventPost.setPosx(posx);
+        eventPost.setPosy(posy);
+        eventPost.setPosz(posz);
+        eventPost.setMode(mode);
+        eventPost.setBlock(mode == 0 ? Blocks.AIR : newBlock);
+        eventPost.setOldBlock(currentBlock);
+        eventPost.invoke();
     }
 }

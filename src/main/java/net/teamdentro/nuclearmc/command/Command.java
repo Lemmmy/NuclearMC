@@ -39,11 +39,16 @@ public abstract class Command {
     }
 
     public static Command getCommand(String name) {
-        if (!commands.containsKey(name)) {
-            return null;
+        for (Map.Entry<String, Command> e : commands.entrySet()) {
+            if (e.getKey().equalsIgnoreCase(name))
+                return e.getValue();
+            else
+                for (String s : e.getValue().getAliases())
+                    if (s.equalsIgnoreCase(name))
+                        return e.getValue();
         }
 
-        return commands.get(name);
+        return null;
     }
 
     public static void clearCommands() {

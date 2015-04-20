@@ -31,11 +31,13 @@ public class CommandsLib extends OneArgFunction {
             Command cmd = new Command() {
                 @Override
                 public String[] getAliases() {
+                    if (tbl.get("aliases") == null || tbl.get("aliases") == LuaValue.NIL) return new String[0];
+
                     LuaTable aliasTable = tbl.get("aliases").checktable();
                     String[] aliases = new String[aliasTable.length()];
 
                     for (int i = 0; i < aliasTable.length(); ++i) {
-                        aliases[i] = String.valueOf(aliasTable.get(i));
+                        aliases[i] = String.valueOf(aliasTable.get(i + 1));
                     }
 
                     return aliases;

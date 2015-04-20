@@ -14,10 +14,11 @@ public abstract class Event {
 
     static {
         registerEvent(EventPostMove.class);
-        registerEvent(EventSetBlock.class);
+        registerEvent(EventPreSetBlock.class);
+        registerEvent(EventPostSetBlock.class);
         registerEvent(EventPostUserConnect.class);
         registerEvent(EventPreMove.class);
-        registerEvent(EventSetBlock.class);
+        registerEvent(EventPreSetBlock.class);
         registerEvent(EventPreUserConnect.class);
         registerEvent(EventUserMessage.class);
         registerEvent(EventUserDisconnect.class);
