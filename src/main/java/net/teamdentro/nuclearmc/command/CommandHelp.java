@@ -23,18 +23,29 @@ public class CommandHelp extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
+        String[] categories = Command.listCategories();
         if (args.length == 0) {
-            String[] categories = Command.listCategories();
-
-            sender.sendMessage("&e Here is a list of command categories:");
+            sender.sendMessage("&eHere is a list of command categories:");
             for (String s : categories) {
                 sender.sendMessage("&6/help &b" + s);
             }
         } else {
+            String cat = "";
+            for (String s : categories) {
+                if (s.trim().toLowerCase().startsWith(args[0].trim().toLowerCase())) {
+                    cat = s;
+                    break;
+                }
+            }
+            if (cat == "") {
+                sender.sendMessage("&cCategory &b" + args[0] + "&c not found");
+                return true;
+            }
+
             Command[] commands = Command.listCommands(args[0]);
             StringBuilder builder = new StringBuilder();
 
-            sender.sendMessage("&e Commands in &b" + args[0] + "&e category:");
+            sender.sendMessage("&eCommands in &b" + cat + "&e category:");
             String prefix = "";
             for (Command cmd : commands) {
                 builder.append(prefix);

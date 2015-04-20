@@ -7,9 +7,12 @@ import net.teamdentro.nuclearmc.packets.SPacket08Teleport;
 import net.teamdentro.nuclearmc.packets.SPacket0CDespawnPlayer;
 import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
 import net.teamdentro.nuclearmc.util.Position;
+import org.luaj.vm2.LuaValue;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 public class User implements CommandSender {
     private InetSocketAddress sender;
@@ -21,6 +24,8 @@ public class User implements CommandSender {
     private boolean op = false;
 
     private Level level;
+
+    private Map<String, Object> properties = new HashMap<>();
 
     /**
      * Instantiates a new user
@@ -237,5 +242,14 @@ public class User implements CommandSender {
             }
         } catch (IOException ignored) {
         }
+    }
+
+    // excuse me intellij, this is fucking used
+    public void setProperty(String property, Object value) {
+        properties.put(property, value);
+    }
+
+    public Object getProperty(String property) {
+        return properties.get(property);
     }
 }

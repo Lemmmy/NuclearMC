@@ -15,6 +15,10 @@ public abstract class Command {
 
     static {
         // Register commands
+        registerCommands();
+    }
+
+    public static void registerCommands() {
         registerCommand(CommandNMCInfo.class);
         registerCommand(CommandReload.class);
         registerCommand(CommandHelp.class);

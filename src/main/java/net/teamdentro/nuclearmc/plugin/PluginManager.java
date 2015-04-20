@@ -152,6 +152,8 @@ public class PluginManager implements Closeable {
 
         boolean success = true;
 
+        Command.registerCommands();
+
         for (Plugin plugin : loadedPlugins) {
             if (!reloadPlugin(plugin)) {
                 success = false;

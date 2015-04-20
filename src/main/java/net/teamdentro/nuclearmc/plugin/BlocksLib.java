@@ -8,6 +8,7 @@ import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.util.Arrays;
 
@@ -28,6 +29,7 @@ public class BlocksLib extends OneArgFunction {
         LuaTable lib = tableOf();
         lib.set("areEqual", new AreEqual());
         lib.set("getBlock", new GetBlock());
+        lib.set("getJBlock", new GetJBlock());
 
         LuaTable metatable = new LuaTable();
         metatable.set("__index", blockTable);
@@ -64,6 +66,15 @@ public class BlocksLib extends OneArgFunction {
         return LuaValue.NIL;
     }
 
+    public static Blocks fromLuaValue(LuaValue block) {
+        for (Blocks b : Blocks.values()) {
+            if (b.getId() == block.checktable().get("id").tobyte()) {
+                return b;
+            }
+        }
+        return Blocks.AIR;
+    }
+
     private class AreEqual extends TwoArgFunction {
         @Override
         public LuaValue call(LuaValue vblock1, LuaValue vblock2) {
@@ -75,6 +86,13 @@ public class BlocksLib extends OneArgFunction {
         @Override
         public LuaValue call(LuaValue arg) {
             return getBlock(arg);
+        }
+    }
+
+    private class GetJBlock extends OneArgFunction {
+        @Override
+        public LuaValue call(LuaValue arg) {
+            return CoerceJavaToLua.coerce(fromLuaValue(arg));
         }
     }
 }
