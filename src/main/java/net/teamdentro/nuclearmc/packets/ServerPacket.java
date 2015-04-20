@@ -71,6 +71,8 @@ public abstract class ServerPacket implements IPacket {
      * @throws IOException
      */
     public void writeString(String str) throws IOException {
+        if (str.length() > 64)
+            str = str.substring(0, 64);
         getWriter().writeBytes(str);
 
         int paddingNeeded = 64 - str.length();

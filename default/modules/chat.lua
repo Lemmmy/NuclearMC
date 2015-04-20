@@ -11,17 +11,6 @@ local function parseCommand(cmd)
 	return cmd, argTable
 end
 
-Commands.addCommand("test", {
-	usage = "",
-	category = "server",
-	
-	execute = function(sender, args)
-		sender:sendMessage("&eIt works!")
-		sender:sendMessage(table.concat(args, ' '))
-		return false
-	end
-})
-
 Event.addListener("UserMessage", function (ev, a, b)
 	if b:sub(1, 1) == "/" then
 		local command, arguments = parseCommand(b)
@@ -45,13 +34,15 @@ Event.addListener("UserMessage", function (ev, a, b)
 		ev:setCancelled(true)
 		return
 	end
+
+	msg = string.gsub(b, "%%(%x)", "&%1")
 	
 	local newMessage = Utils.substitute(DefaultSettings.UserMessage,
 	{
 		{ "player", a:getUsername() },
 		{ "id", a:getPlayerID() },
 		{ "level", a:getLevel():getName() },
-		{ "message", b }
+		{ "message", msg }
 	})
 
 	Server.broadcast(newMessage)
