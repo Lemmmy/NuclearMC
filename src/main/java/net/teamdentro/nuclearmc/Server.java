@@ -46,12 +46,18 @@ public class Server implements Runnable {
     private float heartbeatTimer;
     private String serverURL = "";
     private PluginManager pluginManager = new PluginManager();
+    private File userDirectory;
 
     public Server() {
         running = false;
         config = new ServerConfig();
 
         setupLogFiles();
+
+        userDirectory = new File("users");
+        if (!userDirectory.exists()) {
+            userDirectory.mkdir();
+        }
 
         heartbeatInterval = (int) (heartbeatTimer = config.getInt("HeartbeatInterval", 45));
         serverName = config.getValue("Name", "My NuclearMC Server");
@@ -86,6 +92,10 @@ public class Server implements Runnable {
         } catch (SecurityException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public File getUserDirectory() {
+        return userDirectory;
     }
 
     /**
@@ -553,6 +563,8 @@ public class Server implements Runnable {
      * while they're inside of it, do you?
      */
     public void closeServer() {
+        save();
+
         try {
             pluginManager.close();
         } catch (IOException e) {
@@ -563,6 +575,14 @@ public class Server implements Runnable {
 
         for (int i = 0; i < users.size(); i++) {
             kickUser(users.get(i), config.getValue("ShutdownMessage", "Server is shutting down"));
+        }
+    }
+
+    public void save() {
+        NuclearMC.getLogger().info("Saving...");
+
+        for (User user : users) {
+            user.save();
         }
     }
 }

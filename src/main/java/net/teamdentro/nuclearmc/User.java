@@ -9,9 +9,12 @@ import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
 import net.teamdentro.nuclearmc.util.Position;
 import org.luaj.vm2.LuaValue;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.InetSocketAddress;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class User implements CommandSender {
@@ -26,6 +29,7 @@ public class User implements CommandSender {
     private Level level;
 
     private Map<String, Object> properties = new HashMap<>();
+    private List<String> permissions = new ArrayList<>();
 
     /**
      * Instantiates a new user
@@ -46,9 +50,85 @@ public class User implements CommandSender {
      * Despawns a player.
      */
     public void disconnect() {
+        save();
+
         SPacket0CDespawnPlayer packet = new SPacket0CDespawnPlayer(Server.instance, this);
         packet.setPlayerID(getPlayerID());
         Server.instance.broadcast(packet, false, getLevel());
+    }
+
+    public File getUserFile() {
+        if (!Server.instance.getUserDirectory().exists()) {
+            Server.instance.getUserDirectory().mkdir();
+        }
+
+        return new File(Server.instance.getUserDirectory(), username + ".dat");
+    }
+
+    public void save() {
+        FileOutputStream fos = null;
+        DataOutputStream dos = null;
+
+        try {
+            File userFile = getUserFile();
+            if (!userFile.exists()) {
+                userFile.createNewFile();
+            }
+
+            fos = new FileOutputStream(userFile);
+            dos = new DataOutputStream(fos);
+
+            if (hasPermission("nmc.persist")) {
+                dos.writeBytes(level.getName());
+                dos.writeShort(getPosition().getX());
+                dos.writeShort(getPosition().getY());
+                dos.writeShort(getPosition().getZ());
+                dos.writeShort(getPosition().getPitch());
+                dos.writeShort(getPosition().getYaw());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+
+                if (dos != null) {
+                    dos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Gives this user the specified permission.
+     *
+     * @param permission The permission to give.
+     */
+    public void permit(String permission) {
+        this.permissions.add(permission);
+    }
+
+    /**
+     * Removes the specified permission from the user.
+     *
+     * @param permission The permission to remove.
+     */
+    public void forbid(String permission) {
+        this.permissions.remove(permission);
+    }
+
+    /**
+     * Checks whether this user has a certain permission.
+     *
+     * @param permission The permission to query.
+     * @return Whether this user has the queried permission.
+     */
+    public boolean hasPermission(String permission) {
+        return this.permissions.contains(permission);
     }
 
     @Override
