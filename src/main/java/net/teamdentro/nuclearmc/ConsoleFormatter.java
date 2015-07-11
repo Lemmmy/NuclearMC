@@ -19,7 +19,7 @@ public class ConsoleFormatter extends Formatter {
     }
 
     private String formatDate(long ms) {
-        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date d = new Date(ms);
         return f.format(d);
     }
