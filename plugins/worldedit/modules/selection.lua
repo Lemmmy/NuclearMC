@@ -11,7 +11,8 @@ function WorldEditSelection(points, user, callback)
 
 	user:sendMessage(Utils.substitute(WorldEditSettings.SelectionMessage,
     	{
-    		{ "point", 1 }
+    		{ "point", 1 },
+        { "max", points }
     	}))
 end
 
@@ -37,7 +38,8 @@ Event.addListener("PostSetBlock", function(ev, user, x, y, z, mode, block, oldBl
         			if i < #points then
 						user:sendMessage(Utils.substitute(WorldEditSettings.SelectionMessage,
 					    	{
-					    		{ "point", i + 1 }
+					    		{ "point", i + 1 },
+  					    	{ "max", #points }
 					    	}))
         			else
         				local callback = user:getProperty("worldedit_selection_allpointscallback")
