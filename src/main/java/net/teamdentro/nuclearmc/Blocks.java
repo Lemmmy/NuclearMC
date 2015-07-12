@@ -62,7 +62,7 @@ public enum Blocks {
 
     /**
      * Get all aliases for this block type.
-     * <p/>
+     *
      * Accept all of these for String input.
      *
      * @return A list of aliases for this block
@@ -72,6 +72,11 @@ public enum Blocks {
         return aliases;
     }
 
+    /**
+     * Gets the ID for this block, as a byte
+     *
+     * @return The ID for this block
+     */
     public byte getId() {
         return id;
     }

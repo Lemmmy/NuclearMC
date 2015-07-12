@@ -110,3 +110,52 @@ WorldEdit.Shapes.Line = function (user, points, block)
 
 	return changecount
 end
+
+WorldEdit.Shapes.Rainbow = function (user, points)
+	local changecount = 0
+
+	local wx = math.abs(points[2].x - points[1].x)
+	local wy = math.abs(points[2].y - points[1].y)
+	local wz = math.abs(points[2].z - points[1].z)
+
+	local blockid = Blocks.getBlock("red").id
+	local blockidcurrent = blockid
+	local blockidmax = Blocks.getBlock("pink").id
+
+	if wx >= wy and wx >= wz then
+		for x=points[1].x, points[2].x, points[2].x<points[1].x and -1 or 1 do
+			for y=points[1].y, points[2].y, points[2].y<points[1].y and -1 or 1 do
+				for z=points[1].z, points[2].z, points[2].z<points[1].z and -1 or 1 do
+						changecount = changecount + 1
+						user:getLevel():setBlockNotify(x, y, z, Blocks.getJBlock(Blocks.getBlockFromId(blockidcurrent)))
+				end
+			end
+			blockidcurrent = blockidcurrent + 1
+			if blockidcurrent > blockidmax then blockidcurrent = blockid end
+		end
+	elseif wy > wx and wy > wz then
+		for y=points[1].y, points[2].y, points[2].y<points[1].y and -1 or 1 do
+			for x=points[1].x, points[2].x, points[2].x<points[1].x and -1 or 1 do
+				for z=points[1].z, points[2].z, points[2].z<points[1].z and -1 or 1 do
+						changecount = changecount + 1
+						user:getLevel():setBlockNotify(x, y, z, Blocks.getJBlock(Blocks.getBlockFromId(blockidcurrent)))
+				end
+			end
+			blockidcurrent = blockidcurrent + 1
+			if blockidcurrent > blockidmax then blockidcurrent = blockid end
+		end
+	elseif wz > wy and wz > wx then
+		for z=points[1].z, points[2].z, points[2].z<points[1].z and -1 or 1 do
+			for y=points[1].y, points[2].y, points[2].y<points[1].y and -1 or 1 do
+				for x=points[1].x, points[2].x, points[2].x<points[1].x and -1 or 1 do
+						changecount = changecount + 1
+						user:getLevel():setBlockNotify(x, y, z, Blocks.getJBlock(Blocks.getBlockFromId(blockidcurrent)))
+				end
+			end
+			blockidcurrent = blockidcurrent + 1
+			if blockidcurrent > blockidmax then blockidcurrent = blockid end
+		end
+	end
+
+	return changecount
+end

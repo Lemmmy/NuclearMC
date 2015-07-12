@@ -29,6 +29,7 @@ public class BlocksLib extends OneArgFunction {
         LuaTable lib = tableOf();
         lib.set("areEqual", new AreEqual());
         lib.set("getBlock", new GetBlock());
+        lib.set("getBlockFromId", new GetBlockFromId());
         lib.set("getJBlock", new GetJBlock());
 
         LuaTable metatable = new LuaTable();
@@ -66,6 +67,18 @@ public class BlocksLib extends OneArgFunction {
         return LuaValue.NIL;
     }
 
+    public static LuaValue getBlockFromId(LuaValue vid) {
+        byte id = vid.tobyte();
+
+        for (Blocks b : Blocks.values()) {
+            if (b.getId() == id) {
+                return PluginGlobals.getLuaBlock(b);
+            }
+        }
+
+        return CoerceJavaToLua.coerce(Blocks.AIR.getId());
+    }
+
     public static Blocks fromLuaValue(LuaValue block) {
         for (Blocks b : Blocks.values()) {
             if (b.getId() == block.checktable().get("id").tobyte()) {
@@ -86,6 +99,13 @@ public class BlocksLib extends OneArgFunction {
         @Override
         public LuaValue call(LuaValue arg) {
             return getBlock(arg);
+        }
+    }
+
+    private class GetBlockFromId extends OneArgFunction {
+        @Override
+        public LuaValue call(LuaValue arg) {
+            return getBlockFromId(arg);
         }
     }
 

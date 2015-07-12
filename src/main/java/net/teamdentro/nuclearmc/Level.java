@@ -4,6 +4,8 @@ import net.teamdentro.nuclearmc.packets.SPacket02LevelInitialise;
 import net.teamdentro.nuclearmc.packets.SPacket03LevelData;
 import net.teamdentro.nuclearmc.packets.SPacket04LevelFinalise;
 import net.teamdentro.nuclearmc.packets.SPacket06SetBlock;
+import net.teamdentro.nuclearmc.plugin.PluginGlobals;
+import org.luaj.vm2.LuaTable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -90,6 +92,19 @@ public class Level {
     public Blocks getBlock(int x, int y, int z) {
         return x >= 0 && y >= 0 && z >= 0 && x < width && y < depth && z < height ?
                 Blocks.values()[blocks[getIndex(x, y, z)]] : Blocks.AIR;
+    }
+
+    /**
+     * Gets the block at the specified coordinates, ready for lua
+     *
+     * @param x The X position
+     * @param y The Y position
+     * @param z The Z position
+     * @return The Blocks block at the specified coordinates
+     */
+    public LuaTable getLuaBlock(int x, int y, int z) {
+        return PluginGlobals.getLuaBlock(x >= 0 && y >= 0 && z >= 0 && x < width && y < depth && z < height ?
+                Blocks.values()[blocks[getIndex(x, y, z)]] : Blocks.AIR);
     }
 
     /**

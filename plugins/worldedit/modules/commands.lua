@@ -44,6 +44,51 @@ Commands.addCommand("cuboid", {
 	end
 })
 
+Commands.addCommand("empty", {
+	usage = "",
+	category = "worldedit",
+	aliases = {"clear"},
+
+	execute = function(sender, args)
+		local pts
+		WorldEditSelection(2, sender, function(user, points)
+			local block = Blocks.getBlock("air")
+			local changecount = WorldEdit.Shapes.Cuboid(user, points, block)
+
+			user:sendMessage(Utils.substitute(WorldEditSettings.BlockChangeMessage,
+		    	{
+		    		{ "blocks", changecount }
+		    	}))
+
+			pts = points
+		end)
+
+		return true
+	end
+})
+
+Commands.addCommand("rainbow", {
+	usage = "",
+	category = "worldedit",
+	aliases = {"rb"},
+
+	execute = function(sender, args)
+		local pts
+		WorldEditSelection(2, sender, function(user, points)
+			local changecount = WorldEdit.Shapes.Rainbow(user, points)
+
+			user:sendMessage(Utils.substitute(WorldEditSettings.BlockChangeMessage,
+		    	{
+		    		{ "blocks", changecount }
+		    	}))
+
+			pts = points
+		end)
+
+		return true
+	end
+})
+
 Commands.addCommand("ellipsoid", {
 	usage = "[block]",
 	category = "worldedit",
