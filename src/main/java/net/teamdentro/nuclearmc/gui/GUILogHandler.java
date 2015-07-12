@@ -40,7 +40,7 @@ public class GUILogHandler extends Handler {
     }
 
     private String formatDate(long ms) {
-        SimpleDateFormat f = new SimpleDateFormat("MM/dd HH:mm");
+        SimpleDateFormat f = new SimpleDateFormat("MM/dd HH:mm:ss");
         Date d = new Date(ms);
         return f.format(d);
     }

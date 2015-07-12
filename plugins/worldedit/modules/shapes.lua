@@ -25,24 +25,19 @@ WorldEdit.Shapes.Ellipsoid = function (user, hollow, points, block)
 	local y2 = points[2].y;
 	local z2 = points[2].z;
 
-	local cx = x1 < x2 and x1 + ((x2 - x1) / 2) or x2 + ((x1 - x2) / 2)
-	local cy = y1 < y2 and y1 + ((y2 - y1) / 2) or y2 + ((y1 - y2) / 2)
-	local cz = z1 < z2 and z1 + ((z2 - z1) / 2) or z2 + ((z1 - z2) / 2)
-
-	local rx = math.abs(x2 - x1) / 2
-	local ry = math.abs(y2 - y1) / 2
-	local rz = math.abs(z2 - z1) / 2
-
+	local rx = (math.abs(x2 - x1) + 1) / 2
+	local ry = (math.abs(y2 - y1) + 1) / 2
+	local rz = (math.abs(z2 - z1) + 1) / 2
 	for y=y1, y2, y2<y1 and -1 or 1 do
 		for x=x1, x2, x2<x1 and -1 or 1 do
-			for z=z1, z2, z2<z1 and -1 or 1 do
-				print(x .. " " .. y .. " " .. z)
-				print(math.sqrt(rx * rx + ry * ry + rz * rz))
-				print(math.sqrt(x * x + y * y + z * z))
+			for z=z1, z2 , z2<z1 and -1 or 1 do
+				local lx = x1 < x2 and x2 - x or x1 - x
+				local ly = y1 < y2 and y2 - y or y1 - y
+				local lz = z1 < z2 and z2 - z or z1 - z
+				user:sendMessage("W: " .. (math.abs(x2 - x1) + 1) .. " X: " .. lx .. " R: " .. rx)
 				if math.round(math.sqrt(rx * rx + ry * ry + rz * rz)) ==
-					math.round(math.sqrt(x * x + y * y + z * z)) then
+					math.round(math.sqrt(lx * lx + ly * ly + lz * lz)) then
 					changecount = changecount + 1
-						print("EEEE" .. x .. " " .. y .. " " .. z)
 					user:getLevel():setBlockNotify(x, y, z, Blocks.getJBlock(block))
 				end
 			end
@@ -69,7 +64,7 @@ WorldEdit.Shapes.Line = function (user, points, block)
 
 	local dx = math.abs(x2 - x1)
 	local dy = math.abs(y2 - y1)
-	local dz = math.abs(z2 - x1)
+	local dz = math.abs(z2 - z1)
 
 	if dx + dy + dz == 0 then
 		changecount = changecount + 1
