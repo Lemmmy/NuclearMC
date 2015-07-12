@@ -2,6 +2,8 @@ local config = Server.getConfig("worldedit")
 
 WorldEditSettings = {
 	SelectionMessage = "&ePlace or break a block for point &c${point}",
+	PaintMessage = "&ePaint mode &aenabled&e using block &c${block}&e. Disable using &c &c/&cpaint off",
+	PaintOffMessage = "&ePaint mode &cdisabled&e.",
 	BlockChangeMessage = "&eChanged &c${blocks} &eblocks",
 	InvalidBlockMessage = "&cUnknown block &4${block}",
 }

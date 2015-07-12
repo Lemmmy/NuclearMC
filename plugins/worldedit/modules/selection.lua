@@ -21,7 +21,7 @@ Event.addListener("PostSetBlock", function(ev, user, x, y, z, mode, block, oldBl
 	if selecting then
 		local points = user:getProperty("worldedit_selection_points")
 
-		local oldBlock = oldBlock;
+		local oldBlock = oldBlock
 		user:getLevel():setBlockNotify(x, y, z, Blocks.getJBlock(oldBlock))
 
         if points ~= null and #points > 0 then
@@ -39,7 +39,7 @@ Event.addListener("PostSetBlock", function(ev, user, x, y, z, mode, block, oldBl
 					    	{
 					    		{ "point", i + 1 }
 					    	}))
-        			else        		
+        			else
         				local callback = user:getProperty("worldedit_selection_allpointscallback")
         				if callback ~= null then
         					callback(user, points)
@@ -48,7 +48,7 @@ Event.addListener("PostSetBlock", function(ev, user, x, y, z, mode, block, oldBl
         			end
         			return
         		end
-        	end			
+        	end
 	    end
 	end
 end)

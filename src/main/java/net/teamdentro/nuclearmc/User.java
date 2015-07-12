@@ -7,11 +7,9 @@ import net.teamdentro.nuclearmc.packets.SPacket08Teleport;
 import net.teamdentro.nuclearmc.packets.SPacket0CDespawnPlayer;
 import net.teamdentro.nuclearmc.packets.SPacket0DChatMessage;
 import net.teamdentro.nuclearmc.util.Position;
-import org.luaj.vm2.LuaValue;
 
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -208,13 +206,16 @@ public class User implements CommandSender {
      * @param playerID Some bullshit
      */
     public void sendMessage(String message, byte playerID) {
-        SPacket0DChatMessage msg = new SPacket0DChatMessage(Server.instance, this);
-        msg.setMessage(message);
-        msg.setPlayerID(playerID);
-        msg.setRecipient(this);
-        try {
-            msg.send();
-        } catch (java.io.IOException e) {
+        String[] msgs = message.split("(?<=\\G.{64})");
+        for (String mesg : msgs) {
+            SPacket0DChatMessage msg = new SPacket0DChatMessage(Server.instance, this);
+            msg.setMessage(mesg);
+            msg.setPlayerID(playerID);
+            msg.setRecipient(this);
+            try {
+                msg.send();
+            } catch (java.io.IOException ignored) {
+            }
         }
     }
 

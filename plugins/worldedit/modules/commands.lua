@@ -6,9 +6,9 @@ local function getBlockFromArgs(sender, argn, args, points)
 
 		if not block then
 			sender:sendMessage(Utils.substitute(WorldEditSettings.InvalidBlockMessage,
-		    	{
-		    		{ "block", args[argn] }
-		    	}))
+	    	{
+	    		{ "block", args[argn] }
+	    	}))
 
 			return
 		end
@@ -56,9 +56,9 @@ Commands.addCommand("empty", {
 			local changecount = WorldEdit.Shapes.Cuboid(user, points, block)
 
 			user:sendMessage(Utils.substitute(WorldEditSettings.BlockChangeMessage,
-		    	{
-		    		{ "blocks", changecount }
-		    	}))
+	    	{
+	    		{ "blocks", changecount }
+	    	}))
 
 			pts = points
 		end)
@@ -78,9 +78,9 @@ Commands.addCommand("rainbow", {
 			local changecount = WorldEdit.Shapes.Rainbow(user, points)
 
 			user:sendMessage(Utils.substitute(WorldEditSettings.BlockChangeMessage,
-		    	{
-		    		{ "blocks", changecount }
-		    	}))
+	    	{
+	    		{ "blocks", changecount }
+	    	}))
 
 			pts = points
 		end)
@@ -100,9 +100,9 @@ Commands.addCommand("ellipsoid", {
 			local changecount = WorldEdit.Shapes.Ellipsoid(user, true, points, block)
 
 			user:sendMessage(Utils.substitute(WorldEditSettings.BlockChangeMessage,
-		    	{
-		    		{ "blocks", changecount }
-		    	}))
+	    	{
+	    		{ "blocks", changecount }
+	    	}))
 
 			pts = points
 		end)
@@ -122,9 +122,72 @@ Commands.addCommand("line", {
 			local changecount = WorldEdit.Shapes.Line(user, points, block)
 
 			user:sendMessage(Utils.substitute(WorldEditSettings.BlockChangeMessage,
-		    	{
-		    		{ "blocks", changecount }
-		    	}))
+	    	{
+	    		{ "blocks", changecount }
+	    	}))
+
+			pts = points
+		end)
+
+		return true
+	end
+})
+
+Event.addListener("PostSetBlock", function(ev, user, x, y, z, mode, block, oldBlock)
+	local selecting = user:getProperty("worldedit_selection_selecting")
+	local painting = user:getProperty("worldedit_paint_enabled")
+
+	if not selecting and painting then
+		local paintblock = user:getProperty("worldedit_paint_block")
+		user:getLevel():setBlockNotify(x, y, z, Blocks.getJBlock(paintblock))
+	end
+end)
+
+Commands.addCommand("paint", {
+	usage = "<block>",
+	category = "worldedit",
+
+	execute = function(sender, args)
+		if #args == 1 then
+			if args[1]:lower() == "off" then
+				sender:setProperty("worldedit_paint_enabled", false)
+				sender:sendMessage(WorldEditSettings.PaintOffMessage)
+			else
+				local block = Blocks.getBlock(args[1])
+				if block then
+					sender:setProperty("worldedit_paint_enabled", true)
+					sender:setProperty("worldedit_paint_block", block)
+					sender:sendMessage(Utils.substitute(WorldEditSettings.PaintMessage,
+						{
+							{ "block", block.name}
+						}))
+				else
+					sender:sendMessage(Utils.substitute(WorldEditSettings.InvalidBlockMessage,
+			    	{
+			    		{ "block", args[1] }
+			    	}))
+				end
+			end
+			return true
+		else
+			return false
+		end
+	end
+})
+
+Commands.addCommand("tree", {
+	usage = "",
+	category = "worldedit",
+
+	execute = function(sender, args)
+		local pts
+		WorldEditSelection(1, sender, function(user, points)
+			local changecount = WorldEdit.Shapes.Tree(user, points)
+
+			user:sendMessage(Utils.substitute(WorldEditSettings.BlockChangeMessage,
+	    	{
+	    		{ "blocks", changecount }
+	    	}))
 
 			pts = points
 		end)

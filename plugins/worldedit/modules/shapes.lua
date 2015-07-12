@@ -159,3 +159,39 @@ WorldEdit.Shapes.Rainbow = function (user, points)
 
 	return changecount
 end
+
+WorldEdit.Shapes.Tree = function (user, points)
+	local changecount = 0
+
+	local x1 = points[1].x
+	local y1 = points[1].y
+	local z1 = points[1].z
+
+	local height = math.random(3, 4)
+	local top = 2
+
+	for x = -top, top, 1 do
+		for y = 0, top, 1 do
+			for z = -top, top, 1 do
+				local dist = math.sqrt(x * x + y * y + z * z)
+				if dist < top + 1 then
+					local nx = x1 + x
+					local ny = y1 + y + height - top + 1
+					local nz = z1 + z
+
+					changecount = changecount + 1
+					user:getLevel():setBlockNotify(nx, ny, nz, Blocks.getJBlock(Blocks.getBlock("leaves")))
+				end
+			end
+		end
+	end
+
+	for y = y1, y1 + top + height - 1, 1 do
+			changecount = changecount + 1
+			user:getLevel():setBlockNotify(x1, y, z1, Blocks.getJBlock(Blocks.getBlock("log")))
+	end
+
+	user:getLevel():setBlockNotify(x1, y1 + height + 1, z1, Blocks.getJBlock(Blocks.getBlock("leaves")))
+
+	return changecount
+end
