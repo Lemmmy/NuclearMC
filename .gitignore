@@ -13,8 +13,8 @@ config.lua
 .gradle
 /build
 /lib/
-/gradle/
 config/
 gradlew
 *.txt
 /users
+NuclearMC.ipr
