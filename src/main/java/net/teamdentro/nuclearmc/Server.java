@@ -244,7 +244,7 @@ public class Server implements Runnable {
             @Override
             public void run() {
                 // Minecraft Heartbeat
-                {
+                /*{
                     HttpsURLConnection connection;
                     try {
                         URL url = new URL("https://minecraft.net/heartbeat.jsp"
@@ -273,7 +273,7 @@ public class Server implements Runnable {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
+                }*/
 
                 {
                     // WoM Heartbeat
