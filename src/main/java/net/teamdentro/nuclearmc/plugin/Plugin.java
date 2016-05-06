@@ -50,6 +50,11 @@ public abstract class Plugin implements Closeable {
 
     public abstract LuaValue run(String filename, boolean ignoreFileExistence) throws IOException, LuaError;
 
+    protected boolean fileExists(String filename) {
+        File f = new File(Paths.get(filename).getFileName().toString());
+        return f.exists();
+    }
+
     protected LuaValue runFile(String filename) throws LuaError {
         try (FileInputStream fis = new FileInputStream(filename);
              BufferedReader reader = new BufferedReader(new InputStreamReader(fis))) {

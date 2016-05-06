@@ -6,6 +6,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import net.teamdentro.nuclearmc.event.EventSave;
 import net.teamdentro.nuclearmc.event.EventTick;
 import net.teamdentro.nuclearmc.packets.*;
 import net.teamdentro.nuclearmc.plugin.PluginManager;
@@ -584,5 +585,8 @@ public class Server implements Runnable {
         for (User user : users) {
             user.save();
         }
+
+        EventSave save = new EventSave();
+        save.invoke();
     }
 }

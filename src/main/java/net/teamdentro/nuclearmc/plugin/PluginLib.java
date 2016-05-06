@@ -27,6 +27,7 @@ public class PluginLib extends OneArgFunction {
         pluginLib.set("getWorkingDirectory", new GetWorkingDirectory(this));
         pluginLib.set("resolve", new Resolve(this));
         pluginLib.set("run", new Run(this));
+        pluginLib.set("fileExists", new FileExists(this));
 
         return pluginLib;
     }
@@ -45,6 +46,10 @@ public class PluginLib extends OneArgFunction {
         }
 
         return null;
+    }
+
+    public boolean fileExists(String file) {
+        return plugin.fileExists(file);
     }
 
     private class GetWorkingDirectory extends ZeroArgFunction {
@@ -88,6 +93,19 @@ public class PluginLib extends OneArgFunction {
         @Override
         public LuaValue call(LuaValue arg) {
             return plugin.run(arg.checkjstring());
+        }
+    }
+
+    private class FileExists extends OneArgFunction {
+        private PluginLib plugin;
+
+        public FileExists(PluginLib plugin) {
+            this.plugin = plugin;
+        }
+
+        @Override
+        public LuaValue call(LuaValue arg) {
+            return LuaValue.valueOf(plugin.fileExists(arg.checkjstring()));
         }
     }
 }

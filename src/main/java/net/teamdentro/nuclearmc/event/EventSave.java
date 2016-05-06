@@ -1,7 +1,17 @@
 package net.teamdentro.nuclearmc.event;
 
-/**
- * Created by Lignum on 12/07/2015.
- */
-public class EventSave {
+import org.luaj.vm2.LuaFunction;
+
+public class EventSave extends Event {
+    @Override
+    public String getName() {
+        return "Save";
+    }
+
+    @Override
+    public void invoke() {
+        for (LuaFunction listener : getListeners()) {
+            listener.invoke();
+        }
+    }
 }
