@@ -51,8 +51,8 @@ function Group:RemovePermission(permission)
 end
 
 function Group:UpdateUserPermissions(username)
-
     local ply = Server.getPlayer(username)
+
     if ply ~= nil then
         ply:clearPermissions()
 
@@ -152,9 +152,7 @@ end
 
 function Permissions.GetUserGroup(username)
     for k,v1 in pairs(groups) do
-        print(k)
         for _,v2 in pairs(v1.Users) do
-            print(v2)
             if v2 == username then
                 return k, v1
             end

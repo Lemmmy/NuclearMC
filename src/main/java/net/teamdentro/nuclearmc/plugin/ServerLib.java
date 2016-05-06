@@ -27,8 +27,24 @@ public class ServerLib extends OneArgFunction {
         lib.set("disconnectPlayer", new TellThemToFeckOff());
         lib.set("closeServer", new CloseServerFunc());
         lib.set("toUser", new ToUser());
+        lib.set("getPlayer", new GetPlayerFunc());
 
         return lib;
+    }
+
+    private class GetPlayerFunc extends OneArgFunction {
+        @Override
+        public LuaValue call(LuaValue arg) {
+            String target = arg.checkjstring();
+
+            for (User user : Server.instance.getOnlineUsers()) {
+                if (user.getUsername().equalsIgnoreCase(target)) {
+                    return CoerceJavaToLua.coerce(user);
+                }
+            }
+
+            return LuaValue.NIL;
+        }
     }
 
     private class BroadcastFunc extends OneArgFunction {

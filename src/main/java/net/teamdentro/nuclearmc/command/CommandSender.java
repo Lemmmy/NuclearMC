@@ -7,4 +7,6 @@ public interface CommandSender {
     void sendMessage(String message);
 
     boolean isPlayer();
+
+    boolean hasPermission(String permission);
 }

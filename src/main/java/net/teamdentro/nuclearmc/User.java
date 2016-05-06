@@ -129,6 +129,13 @@ public class User implements CommandSender {
         return this.permissions.contains(permission);
     }
 
+    /**
+     * Removes all permissions from this user.
+     */
+    public void clearPermissions() {
+        permissions.clear();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof User)) {

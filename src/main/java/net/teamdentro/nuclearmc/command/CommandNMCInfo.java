@@ -28,6 +28,11 @@ public class CommandNMCInfo extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("nmc.info")) {
+            sender.sendMessage("&cYou don't have permission to view this.");
+            return true;
+        }
+
         sender.sendMessage("&aThis server is running NuclearMC v" + NuclearMC.getVersion());
         return true;
     }
