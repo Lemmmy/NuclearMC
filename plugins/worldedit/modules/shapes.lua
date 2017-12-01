@@ -25,20 +25,35 @@ WorldEdit.Shapes.Ellipsoid = function (user, hollow, points, block)
 	local y2 = points[2].y;
 	local z2 = points[2].z;
 
-	local rx = (math.abs(x2 - x1) + 1) / 2
-	local ry = (math.abs(y2 - y1) + 1) / 2
-	local rz = (math.abs(z2 - z1) + 1) / 2
-	for y=y1, y2, y2<y1 and -1 or 1 do
-		for x=x1, x2, x2<x1 and -1 or 1 do
-			for z=z1, z2 , z2<z1 and -1 or 1 do
-				local lx = x1 < x2 and x2 - x or x1 - x
-				local ly = y1 < y2 and y2 - y or y1 - y
-				local lz = z1 < z2 and z2 - z or z1 - z
-				user:sendMessage("W: " .. (math.abs(x2 - x1) + 1) .. " X: " .. lx .. " R: " .. rx)
-				if math.round(math.sqrt(rx * rx + ry * ry + rz * rz)) ==
-					math.round(math.sqrt(lx * lx + ly * ly + lz * lz)) then
+	local sx = math.abs(x2 - x1)
+	local sy = math.abs(y2 - y1)
+	local sz = math.abs(z2 - z1)
+
+	local rx = sx / 2
+	local ry = sy / 2
+	local rz = sz / 2
+
+	local ox = math.min(x1, x2)
+	local oy = math.min(y1, y2)
+	local oz = math.min(z1, z2)
+
+	user:sendMessage(sx .. " " .. sy .. " " .. sz)
+
+	for y = -ry, ry do
+		for x = -rx, rx do
+			for z = -rz, rz do
+				local a = (x * x) / (rx * rx) + (y * y) / (ry * ry) + (z * z) / (rz * rz)
+				local place
+
+				if hollow then
+					place = a > 0.9 and a < 1.1
+				else
+					place = a <= 1
+				end
+
+				if place then
 					changecount = changecount + 1
-					user:getLevel():setBlockNotify(x, y, z, Blocks.getJBlock(block))
+					user:getLevel():setBlockNotify(x + rx + ox, y + ry + oy, z + rz + oz, Blocks.getJBlock(block))
 				end
 			end
 		end

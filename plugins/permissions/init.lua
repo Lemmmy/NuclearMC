@@ -12,6 +12,6 @@ Event.addListener("Save", function(ev)
 end)
 
 Event.addListener("PostUserConnect", function(ev, user)
-    local groupName, group = Permissions.GetUserGroup(user:getUsername())
-    group:UpdateUserPermissions(user:getUsername())
+    -- local groupName, group = Permissions.GetUserGroup(user:getUsername())
+    -- group:UpdateUserPermissions(user:getUsername())
 end)
